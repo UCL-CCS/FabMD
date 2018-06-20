@@ -10,6 +10,8 @@ from base.fab import *
 # Add local script, blackbox and template path.
 add_local_paths("FabMD")
 
+FabMD_path = get_plugin_path('FabMD')
+
 @task
 def lammps(config,**args):
     """Submit a LAMMPS job to the remote queue.
@@ -23,10 +25,15 @@ def lammps(config,**args):
             wall_time : wall-time job limit
             memory : memory per node
     """
-    update_environment(args)
     with_config(config)
     execute(put_configs,config)
-    job(dict(script='lammps', wall_time='0:15:0', memory='2G'),args)
+    defaults = yaml.load(open(FabMD_path+'/default_settings/lammps.yaml'))
+    job(dict(script='lammps', 
+             wall_time = defaults['wall_time'], 
+             lammps_input = defaults['lammps_input'], 
+             cores = defaults['cores'],
+             memory = '2G'),
+             args)
 
 @task
 def lammps_epoxy(config,**args):

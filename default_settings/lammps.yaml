@@ -1,0 +1,3 @@
+lammps_input: "in.lammps"
+wall_time: "1:00:00"
+cores: 1
