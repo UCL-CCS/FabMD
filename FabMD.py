@@ -8,7 +8,7 @@
 from base.fab import *
 
 # Add local script, blackbox and template path.
-add_local_paths("NanoMD")
+add_local_paths("FabMD")
 
 @task
 def lammps(config,**args):
