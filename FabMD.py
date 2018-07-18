@@ -37,13 +37,13 @@ def lammps(config,**args):
 @task
 def lammps_ensemble(config, sweep_dir, **kwargs):
     defaults = yaml.load(open(FabMD_path+'/default_settings/lammps.yaml'))
-    run_ensemble(config, sweep_dir, 
-             dict(script='lammps', 
-             wall_time = defaults['wall_time'], 
-             lammps_input = defaults['lammps_input'], 
-             cores = defaults['cores'],
-             memory = '2G'),
-             **kwargs)
+    ensemble_args = dict(script='lammps', 
+                         wall_time = defaults['wall_time'], 
+                         lammps_input = defaults['lammps_input'], 
+                         cores = defaults['cores'],
+                        memory = '2G')
+    ensemble_args.update(kwargs)
+    run_ensemble(config, sweep_dir, **ensemble_args)
 
 @task
 def lammps_epoxy(config,**args):
