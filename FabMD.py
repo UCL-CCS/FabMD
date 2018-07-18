@@ -35,7 +35,7 @@ def lammps(config,**args):
              memory = '2G'),
              args)
 @task
-def lammps_ensemble(config, sweep_dir, **args):
+def lammps_ensemble(config, sweep_dir, **kwargs):
     defaults = yaml.load(open(FabMD_path+'/default_settings/lammps.yaml'))
     run_ensemble(config, sweep_dir, 
              dict(script='lammps', 
@@ -43,7 +43,7 @@ def lammps_ensemble(config, sweep_dir, **args):
              lammps_input = defaults['lammps_input'], 
              cores = defaults['cores'],
              memory = '2G'),
-             args)
+             **kwargs)
 
 @task
 def lammps_epoxy(config,**args):
