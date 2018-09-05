@@ -34,15 +34,23 @@ def lammps(config,**args):
              cores = defaults['cores'],
              memory = '2G'),
              args)
+
 @task
-def lammps_ensemble(config, sweep_dir, **kwargs):
+def lammps_ensemble(config, sweep_dir=False, **kwargs):
     defaults = yaml.load(open(FabMD_path+'/default_settings/lammps.yaml'))
     ensemble_args = dict(script='lammps', 
                          wall_time = defaults['wall_time'], 
                          lammps_input = defaults['lammps_input'], 
                          cores = defaults['cores'],
-                        memory = '2G')
+                        memory = '2G',
+                        input_name_in_config='topology.data')
     ensemble_args.update(kwargs)
+
+    # If sweep_dir not set, assume it is a directory in config with a default name
+    if sweep_dir == False: 
+        path_to_config = find_config_file_path(config)
+        sweep_dir = path_to_config + "/" + defaults["sweep_dir_name" ]
+
     run_ensemble(config, sweep_dir, **ensemble_args)
 
 @task
