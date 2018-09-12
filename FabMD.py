@@ -42,8 +42,8 @@ def lammps_ensemble(config, sweep_dir=False, **kwargs):
                          wall_time = defaults['wall_time'], 
                          lammps_input = defaults['lammps_input'], 
                          cores = defaults['cores'],
-                        memory = '2G',
-                        input_name_in_config='topology.data')
+                         memory = '2G')
+                        #input_name_in_config='topology.data')
     ensemble_args.update(kwargs)
 
     # If sweep_dir not set, assume it is a directory in config with a default name
