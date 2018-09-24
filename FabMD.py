@@ -50,6 +50,9 @@ def lammps_ensemble(config, sweep_dir=False, **kwargs):
     if sweep_dir == False: 
         path_to_config = find_config_file_path(config)
         sweep_dir = path_to_config + "/" + defaults["sweep_dir_name" ]
+    
+    if 'input_name_in_config' not in ensemble_args:
+        raise RuntimeError('Must declare input_name_in_config: the generic name which sweep directory files will be changed to')
 
     run_ensemble(config, sweep_dir, **ensemble_args)
 
