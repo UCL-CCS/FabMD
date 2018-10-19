@@ -1,0 +1,19 @@
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + '/../')
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + '/../../../')
+
+from FabMD import lammps, setup_lammps, execute_lammps
+from deploy.machines import machine
+#lammps_ensemble
+
+import fileinput
+
+#def test_lammps():
+    """
+    The main FabSim3 test suite. Every test is captured in an assert statement.
+    """
+#    machine('localhost')
+#    defaults = setup_lammps('lammps_test1')
+#    assert(type(defaults) == 'dict')
