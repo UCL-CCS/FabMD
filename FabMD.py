@@ -14,7 +14,14 @@ FabMD_path = get_plugin_path('FabMD')
 
 @task
 def lammps(config,**args):
-    """Submit a LAMMPS job to the remote queue.
+    md_job(config,'lammps',args)
+
+@task
+def namd(config,**args):
+    md_job(config,'namd',args)
+
+def md_job(config,script,args):
+    """Submit an MD job to the remote queue with a given script; e.g. LAMMPS NAMD
     The job results will be stored with a name pattern as defined in the environment,
     e.g. cylinder-abcd1234-legion-256
     config : config directory to use to define geometry, e.g. config=cylinder
@@ -28,7 +35,7 @@ def lammps(config,**args):
     with_config(config)
     execute(put_configs,config)
     defaults = yaml.load(open(FabMD_path+'/default_settings/lammps.yaml'))
-    job(dict(script='lammps', 
+    job(dict(script=script, 
              wall_time = defaults['wall_time'], 
              lammps_input = defaults['lammps_input'], 
              cores = defaults['cores'],
