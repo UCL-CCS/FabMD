@@ -15,10 +15,12 @@ FabMD_path = get_plugin_path('FabMD')
 @task
 def lammps(config,**args):
     md_job(config,'lammps',args)
-
 @task
 def namd(config,**args):
     md_job(config,'namd',args)
+@task
+def gromacs(config,**args):
+    md_job(config,'gromacs',args)
 
 def md_job(config,script,args):
     """Submit an MD job to the remote queue with a given script; e.g. LAMMPS NAMD
@@ -34,7 +36,7 @@ def md_job(config,script,args):
     """
     with_config(config)
     execute(put_configs,config)
-    defaults = yaml.load(open(FabMD_path+'/default_settings/lammps.yaml'))
+    defaults = yaml.load(open(FabMD_path+'/default_settings/'+script+'.yaml'))
     job(dict(script=script, 
              wall_time = defaults['wall_time'], 
              lammps_input = defaults['lammps_input'], 
@@ -44,8 +46,18 @@ def md_job(config,script,args):
 
 @task
 def lammps_ensemble(config, sweep_dir=False, **kwargs):
-    defaults = yaml.load(open(FabMD_path+'/default_settings/lammps.yaml'))
-    ensemble_args = dict(script='lammps', 
+    md_ensemble(config,'lammps',sweep_dir,kwargs)
+@task
+def gromacs_ensemble(config, sweep_dir=False, **kwargs):
+    md_ensemble(config,'gromacs',sweep_dir,kwargs)
+@task
+def namd_ensemble(config, sweep_dir=False, **kwargs):
+    md_ensemble(config,'namd',sweep_dir,kwargs)
+
+@task
+def md_ensemble(config, script, sweep_dir, kwargs):
+    defaults = yaml.load(open(FabMD_path+'/default_settings/'+script+'.yaml'))
+    ensemble_args = dict(script = script, 
                          wall_time = defaults['wall_time'], 
                          lammps_input = defaults['lammps_input'], 
                          cores = defaults['cores'],
@@ -56,7 +68,7 @@ def lammps_ensemble(config, sweep_dir=False, **kwargs):
     # If sweep_dir not set, assume it is a directory in config with a default name
     if sweep_dir == False: 
         path_to_config = find_config_file_path(config)
-        sweep_dir = path_to_config + "/" + defaults["sweep_dir_name" ]
+        sweep_dir = path_to_config + "/" + defaults["sweep_dir_name"]
     
     if 'input_name_in_config' not in ensemble_args:
         raise RuntimeError('Must declare input_name_in_config: the generic name which sweep directory files will be changed to')
