@@ -15,12 +15,15 @@ FabMD_path = get_plugin_path('FabMD')
 @task
 def lammps(config,**args):
     md_job(config,'lammps',args)
-@task
-def namd(config,**args):
-    md_job(config,'namd',args)
+
 @task
 def gromacs(config,**args):
+    env.grompp_command = make_grompp_command(config,args)
     md_job(config,'gromacs',args)
+
+#@task
+#def namd(config,**args):
+#    md_job(config,'namd',args)
 
 def md_job(config,script,args):
     """Submit an MD job to the remote queue with a given script; e.g. LAMMPS NAMD
@@ -49,10 +52,12 @@ def lammps_ensemble(config, sweep_dir=False, **kwargs):
     md_ensemble(config,'lammps',sweep_dir,kwargs)
 @task
 def gromacs_ensemble(config, sweep_dir=False, **kwargs):
+    env.grompp_command = make_grompp_command(config,args)
     md_ensemble(config,'gromacs',sweep_dir,kwargs)
-@task
-def namd_ensemble(config, sweep_dir=False, **kwargs):
-    md_ensemble(config,'namd',sweep_dir,kwargs)
+
+#@task
+#def namd_ensemble(config, sweep_dir=False, **kwargs):
+#    md_ensemble(config,'namd',sweep_dir,kwargs)
 
 @task
 def md_ensemble(config, script, sweep_dir, kwargs):
@@ -75,6 +80,63 @@ def md_ensemble(config, script, sweep_dir, kwargs):
 
     run_ensemble(config, sweep_dir, **ensemble_args)
 
+@task
+def make_grompp_command(config,args):
+    config_dir = find_config_file_path(config)
+    required_files = {'grompp'    :{'extension':'.mdp', 'flag':'f'},
+                      'conf'      :{'extension':'.gro', 'flag':'c'},
+                      'topol'     :{'extension':'.top', 'flag':'p'}}
+    optional_files = {'checkpoint':{'extension':'.cpt', 'flag':'t'},
+                      'index'     :{'extension':'.ndx', 'flag':'n'}}
+    
+    defaults = yaml.load(open(FabMD_path+'/default_settings/gromacs.yaml'))
+    
+    grompp_args = {}
+    for reqfile in required_files:
+        flag = required_files[reqfile]['flag']
+    
+        # specified in command line?
+        if reqfile in args: 
+            grompp_args[flag] = args[reqfile]
+            continue
+        
+        # specified as default?
+        if reqfile in defaults['required_files']:
+            if defaults['required_files'][reqfile]:
+                grompp_args[flag] = defaults['required_files'][reqfile]
+                continue
+        
+        # find file in config directory with the correct extension?
+        possible_files = []
+        for file_ in os.listdir(config_dir):
+            if file_.endswith(required_files[reqfile]['extension']):
+                possible_files += [file_]
+        if len(possible_files) > 1:
+            print('=====')
+            print('Found multiple possible',reqfile,'files:')
+            print(possible_files)
+            print('Specify which to use')
+        elif len(possible_files) == 1:
+            grompp_args[flag] = possible_files[0]
+            continue
+        
+        # no file found, warn user and exit
+        print('Could not find a ',reqfile,'file.')
+        sys.exit()
+
+    for optfile in optional_files:
+        flag = optional_files[optfile]['flag']
+        #specified in command line?
+        if optfile in args: 
+            grompp_args[flag] = args[optfile]
+            continue
+
+    grompp_command = ''
+    for arg in grompp_args:
+        grompp_command += '-'+arg+' '+grompp_args[arg]+' '
+    print('grompp arguments = ',grompp_command)
+    return grompp_command
+ 
 @task
 def lammps_epoxy(config,**args):
     """Submit a LAMMPS job to the remote queue.
