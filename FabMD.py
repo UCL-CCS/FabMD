@@ -21,10 +21,6 @@ def gromacs(config,**args):
     env.grompp_command = make_grompp_command(config,args)
     md_job(config,'gromacs',args)
 
-#@task
-#def namd(config,**args):
-#    md_job(config,'namd',args)
-
 def md_job(config,script,args):
     """Submit an MD job to the remote queue with a given script; e.g. LAMMPS NAMD
     The job results will be stored with a name pattern as defined in the environment,
@@ -55,11 +51,6 @@ def gromacs_ensemble(config, sweep_dir=False, **kwargs):
     env.grompp_command = make_grompp_command(config,args)
     md_ensemble(config,'gromacs',sweep_dir,kwargs)
 
-#@task
-#def namd_ensemble(config, sweep_dir=False, **kwargs):
-#    md_ensemble(config,'namd',sweep_dir,kwargs)
-
-@task
 def md_ensemble(config, script, sweep_dir, kwargs):
     defaults = yaml.load(open(FabMD_path+'/default_settings/'+script+'.yaml'))
     ensemble_args = dict(script = script, 
@@ -80,7 +71,6 @@ def md_ensemble(config, script, sweep_dir, kwargs):
 
     run_ensemble(config, sweep_dir, **ensemble_args)
 
-@task
 def make_grompp_command(config,args):
     config_dir = find_config_file_path(config)
     required_files = {'grompp'    :{'extension':'.mdp', 'flag':'f'},

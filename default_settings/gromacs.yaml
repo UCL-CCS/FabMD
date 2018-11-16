@@ -1,0 +1,8 @@
+lammps_input: "gromacs.input"
+wall_time: "1:00:00"
+cores: 1
+sweep_dir_name: "SWEEP"
+required_files:
+    gromp:
+    conf:
+    topol:
