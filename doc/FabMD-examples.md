@@ -1,11 +1,11 @@
-### Running a lammmps job
+# How to run MD Jobs
+
+## LAMMPS
 
 For these examples we assume LAMMPS has been installed on the desired host machine and the location (``host: lammps_exec``) has been specified in the file ``deplot/machines_usr.yml``.
 
-# Running Lammps_test1
-
 All the input files required for the LAMMPS simulation should be contained in a directory in ``config_files``. Then type:
-``fab localhost lammps:lammps_test1```
+``fab localhost lammps:lammps_test1``
 
 Modifications can be added in the command line like:
 ```fab host lammps:lammps_test1,lammps_input:in.lammps,wall_time:1:00:00,cores=1```
