@@ -2,9 +2,9 @@
 
 For this example we assume LAMMPS has been installed on the desired host machine and the location (``host: lammps_exec``) has been specified in the file ``deplot/machines_usr.yml``.
 
-All the input files required for the LAMMPS simulation should be contained in a directory in ``config_files``. 
+All the input files required for a LAMMPS simulation should be contained in a directory in ``config_files``. 
 
-An minimal example LAMMPS simulation is provided in ``config_files/lammps_test1``, to execute this example type:
+A minimal example LAMMPS simulation is provided in ``config_files/lammps_test1``, to execute this example type:
 
 ``fab localhost lammps:lammps_test1``
 
