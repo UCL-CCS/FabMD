@@ -51,6 +51,9 @@ def fabmd_easyvvuq_example(config, **args):
     #    parameters determined by the `Sampler`(s).
     #    This makes use of the `Encoder` specified in the input file.
     my_campaign.populate_runs_dir()
+
+    campaign2ensemble(config, campaign_dir=my_campaign.campaign_dir)
+
 """
 # 5. Run execution - note this method of running all jobs is just for demo
 #    purposes.
