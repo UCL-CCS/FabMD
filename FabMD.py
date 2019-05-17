@@ -7,10 +7,63 @@
 
 from base.fab import *
 
+from  user_workflows import *
+
 # Add local script, blackbox and template path.
 add_local_paths("FabMD")
 
 FabMD_path = get_plugin_path('FabMD')
+
+@task
+def fabmd_easyvvuq_example(config, **args):
+    update_environment(args)
+    with_config(config)
+    name = "fabmd_easyvvuq_example"
+
+    fabmd_path = get_plugin_path("FabMD")
+
+    # Need a tmp directory for EasyVVUQ/FabSim file juggle
+    tmp_path = fabmd_path+"/tmp"
+    if not os.path.isdir(tmp_path):
+        os.mkdir(tmp_path)
+
+    # Input file containing information about parameters of interest
+    input_json = "ensemble_input.json"
+
+    # 1. Initialize `Campaign` object which information on parameters to be sampled
+    #    and the values used for all sampling runs
+    my_campaign = uq.Campaign(state_filename=input_json, workdir=tmp_path, name=name)
+
+    # 2. Set which parameters we wish to include in the analysis and the
+    #    distribution from which to draw samples
+    my_campaign.vary_param("velocity_seed", dist=uq.distributions.uniform_integer(1,1000000))
+
+    # 3. Determine the runs to be executed in order to sample the parameter space.
+    #    Settings for the chosen number of runs are produced using `Sampler`s
+    #    which determine how combinations of parameters are selected for each one
+
+    # First we create three samples where the varying parameter ()"mu", the mean)
+    # is chosen directly from the selected distribution. If multiple parameters
+    # were allowed to vary then all would be sampled independently.
+    number_of_samples = 5
+    random_sampler = uq.elements.sampling.RandomSampler(my_campaign)
+    my_campaign.add_runs(random_sampler, max_num=number_of_samples)
+
+    # The `Replicate` sampler creates copies of the different parameter runs
+    # created above (to gain additional sampled in the same area of parameter
+    # space).
+    #number_of_replicas = 1
+    #replicator = uq.elements.sampling.Replicate(my_campaign,
+    #                                            replicates=number_of_replicas)
+    #my_campaign.add_runs(replicator)
+
+    # 4. Create directories containing inputs for each run containing the
+    #    parameters determined by the `Sampler`(s).
+    #    This makes use of the `Encoder` specified in the input file.
+    my_campaign.populate_runs_dir()
+
+    campaign2ensemble(config, campaign_dir=my_campaign.campaign_dir)
+
 
 @task
 def lammps(config,**args):
