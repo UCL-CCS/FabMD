@@ -78,8 +78,8 @@ def md_ensemble(config, script, sweep_dir, kwargs):
 
     if 'input_name_in_config' not in ensemble_args:
         raise RuntimeError(
-            'Must declare input_name_in_config: the generic name which sweep
-             directory files will be changed to')
+            'Must declare input_name_in_config: the generic name which sweep'+
+             'directory files will be changed to')
 
     run_ensemble(config, sweep_dir, **ensemble_args)
 
@@ -370,22 +370,14 @@ def easymd_example(config, **args):
     my_campaign.vary_param("velocity_seed",
                            dist=uq.distributions.uniform_integer(1, 1000000))
 
-    # Determine the runs to be executed in order to sample the parameter space.
-    # Settings for the chosen number of runs are produced using `Sampler`s
-    # which determine how combinations of parameters are selected for each one
-
     # Set number of runs where velocity_seed is varyied acording to the
     # above distribution. If multiple parameters
     number_of_samples = 5
     random_sampler = uq.elements.sampling.RandomSampler(my_campaign)
     my_campaign.add_runs(random_sampler, max_num=number_of_samples)
 
-    # The `Replicate` sampler creates copies of the different parameter runs
-    # created above (to gain additional sampled in the same area of parameter
-    # space).
-    number_of_replicas = 1
-    replicator = uq.elements.sampling.Replicate(my_campaign,
-                                                replicates=number_of_replicas)
+    # only run one with each velocity_seed
+    replicator = uq.elements.sampling.Replicate(my_campaign, replicates=1)
     my_campaign.add_runs(replicator)
 
     # Create directories containing inputs for each run containing the
