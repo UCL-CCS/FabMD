@@ -7,7 +7,6 @@
 
 from base.fab import *
 
-
 #from plugins.FabMD.user_workflows import *
 
 # Add local script, blackbox and template path.
@@ -313,11 +312,22 @@ def lammps_get_pressure(log_dir,number):
 
 @task
 def easymd_example(config, **args):
+    """
+    Example workflow for an EasyVVUQ, FabMD LAMMPS ensemble. 
+    Part 1 of 2, this builds ensemble and submits the simulations
+
+    config : config directory to use that contains input files
+    Keyword arguments:
+            cores : number of compute cores to request
+            images : number of images to take
+            steering : steering session i.d.
+            wall_time : wall-time job limit
+            memory : memory per node
+    """
     import easyvvuq as uq
     update_environment(args)
     with_config(config)
     config_dir = find_config_file_path(config)
-
 
     # need a tmp folder for EasyVVUQ
     tmp_path = FabMD_path+"/tmp"
@@ -325,13 +335,14 @@ def easymd_example(config, **args):
         os.mkdir(tmp_path)
 
     # Input file containing information about parameters of interest
-    input_json = config_dir + "/ensemble_input.json"
+    easyvvuq_input = config_dir + "/ensemble_input.json"
 
     # Initialize `Campaign` object
-    my_campaign = uq.Campaign(state_filename=input_json, workdir=tmp_path)
+    my_campaign = uq.Campaign(state_filename=easyvvuq_input, workdir=tmp_path)
 
     # Set parameters to vary: velocity seed will be a random integer
-    my_campaign.vary_param("velocity_seed", dist=uq.distributions.uniform_integer(1,1000000))
+    my_campaign.vary_param("velocity_seed", 
+                           dist=uq.distributions.uniform_integer(1,1000000))
 
     # Determine the runs to be executed in order to sample the parameter space.
     # Settings for the chosen number of runs are produced using `Sampler`s
@@ -368,6 +379,11 @@ def easymd_example(config, **args):
 @task
 def easymd_example_analyse(config, output_dir, **args):
     """
+    Example workflow for an EasyVVUQ, FabMD LAMMPS ensemble. 
+    Part 2 of 2, this collects simulation data and averages the results
+
+    config : config directory to use that contains input files
+    Keyword arguments:
     output_dir: name of results directory e.g. fabsim_easyvvuq_archer_24
     """
     import easyvvuq as uq
