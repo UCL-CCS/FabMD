@@ -32,7 +32,7 @@ The generalised commands are:
 ```
 fab remote_machine easymd_example:config_dir
 fab remote_machine monitor - (wait until execution has finished)
-fab remote_machine easymd_example_analyse:config_dir,results_dir
+fab remote_machine easymd_example_analyse:config_dir,output_dir
 ```
 
 ### Command explanation
