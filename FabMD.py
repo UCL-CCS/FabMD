@@ -7,7 +7,8 @@
 
 from base.fab import *
 
-from  user_workflows import *
+
+#from plugins.FabMD.user_workflows import *
 
 # Add local script, blackbox and template path.
 add_local_paths("FabMD")
@@ -309,3 +310,93 @@ def lammps_get_pressure(log_dir,number):
     d1 = np.array(pressures[5:])
     print("READ: new_CG.prod%d.log" % (number))
     return np.average(d1), np.std(d1) #average and stdev
+
+@task
+def fabmd_easyvvuq_example(config, **args):
+    import easyvvuq as uq
+    update_environment(args)
+    with_config(config)
+
+    # need a tmp folder for EasyVVUQ
+    tmp_path = FabMD_path+"/tmp"
+    if not os.path.isdir(tmp_path):
+        os.mkdir(tmp_path)
+
+    # Input file containing information about parameters of interest
+    input_json = "ensemble_input.json"
+
+    # Initialize `Campaign` object
+    my_campaign = uq.Campaign(state_filename=input_json, workdir=tmp_path)
+
+    # Set parameters to vary: velocity seed will be a random integer
+    my_campaign.vary_param("velocity_seed", dist=uq.distributions.uniform_integer(1,1000000))
+
+    # Determine the runs to be executed in order to sample the parameter space.
+    # Settings for the chosen number of runs are produced using `Sampler`s
+    # which determine how combinations of parameters are selected for each one
+
+    # Set number of runs where velocity_seed is varyied acording to the 
+    # above distribution. If multiple parameters
+    number_of_samples = 5
+    random_sampler = uq.elements.sampling.RandomSampler(my_campaign)
+    my_campaign.add_runs(random_sampler, max_num=number_of_samples)
+
+    # The `Replicate` sampler creates copies of the different parameter runs
+    # created above (to gain additional sampled in the same area of parameter
+    # space).
+    number_of_replicas = 1
+    replicator = uq.elements.sampling.Replicate(my_campaign,
+                                            replicates=number_of_replicas)
+    my_campaign.add_runs(replicator)
+
+    # Create directories containing inputs for each run containing the
+    # parameters determined by the `Sampler`(s).
+    # This makes use of the `Encoder` specified in the input file.
+    my_campaign.populate_runs_dir()
+
+    # Save campaign state for later analysis step
+    my_campaign.save_state('save_campaign_state.json') 
+
+    # Convert campaign to FabSim ensemble for execution
+    campaign2ensemble(config, campaign_dir=my_campaign.campaign_dir)
+
+    # Execute lammps ensemble job
+    lammps_ensemble(config, input_name_in_config="in.lammps")
+
+@task
+def fabmd_easyvvuq_example_analyse(config, output_dir, **args):
+    """
+    output_dir: name of results directory e.g. fabsim_easyvvuq_archer_24
+    """
+    import easyvvuq as uq
+    update_environment(args)
+    with_config(config)
+
+    # Reload EasyVVUQ campaign state
+    my_campaign = uq.Campaign(state_filename='save_campaign_state.json')
+
+    # Retrive results from execution machine and organise them back into campaign 
+    fetch_results()
+    ensemble2campaign(env.local_results +'/'+ output_dir, my_campaign.campaign_dir)
+
+    # Aggregate the results from all runs.
+    # This makes use of the `Decoder` selected in the input file to interpret the
+    # run output and produce summary pandas dataframe.
+    output_filename = my_campaign.params_info['out_file']['default']
+    output_columns = ['Value']
+    aggregate = uq.elements.collate.AggregateSamples(
+                                                my_campaign,
+                                                output_columns=output_columns,
+                                                output_filename=output_filename,
+                                                header=0,
+                                                average=True
+                                                )
+    data_frame = aggregate.apply()
+    print (data_frame)
+
+    # Calculate average energy from results
+    values = data_frame[output_columns[0]]
+    mean = np.mean(values)
+    std  = np.std(values)
+    print('Mean:', mean,  '+/-', std)
+

@@ -1,4 +1,4 @@
 lammps_input: "in.lammps"
-wall_time: "1:00:00"
+wall_time: "0:10:00"
 cores: 24
 sweep_dir_name: "SWEEP"
