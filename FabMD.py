@@ -312,10 +312,12 @@ def lammps_get_pressure(log_dir,number):
     return np.average(d1), np.std(d1) #average and stdev
 
 @task
-def fabmd_easyvvuq_example(config, **args):
+def easymd_example(config, **args):
     import easyvvuq as uq
     update_environment(args)
     with_config(config)
+    config_dir = find_config_file_path(config)
+
 
     # need a tmp folder for EasyVVUQ
     tmp_path = FabMD_path+"/tmp"
@@ -323,7 +325,7 @@ def fabmd_easyvvuq_example(config, **args):
         os.mkdir(tmp_path)
 
     # Input file containing information about parameters of interest
-    input_json = "ensemble_input.json"
+    input_json = config_dir + "/ensemble_input.json"
 
     # Initialize `Campaign` object
     my_campaign = uq.Campaign(state_filename=input_json, workdir=tmp_path)
@@ -355,7 +357,7 @@ def fabmd_easyvvuq_example(config, **args):
     my_campaign.populate_runs_dir()
 
     # Save campaign state for later analysis step
-    my_campaign.save_state('save_campaign_state.json') 
+    my_campaign.save_state(config_dir+'/save_campaign_state.json') 
 
     # Convert campaign to FabSim ensemble for execution
     campaign2ensemble(config, campaign_dir=my_campaign.campaign_dir)
@@ -364,16 +366,17 @@ def fabmd_easyvvuq_example(config, **args):
     lammps_ensemble(config, input_name_in_config="in.lammps")
 
 @task
-def fabmd_easyvvuq_example_analyse(config, output_dir, **args):
+def easymd_example_analyse(config, output_dir, **args):
     """
     output_dir: name of results directory e.g. fabsim_easyvvuq_archer_24
     """
     import easyvvuq as uq
     update_environment(args)
     with_config(config)
+    config_dir = find_config_file_path(config)
 
     # Reload EasyVVUQ campaign state
-    my_campaign = uq.Campaign(state_filename='save_campaign_state.json')
+    my_campaign = uq.Campaign(state_filename=config_dir+'/save_campaign_state.json')
 
     # Retrive results from execution machine and organise them back into campaign 
     fetch_results()
@@ -395,7 +398,7 @@ def fabmd_easyvvuq_example_analyse(config, output_dir, **args):
     print (data_frame)
 
     # Calculate average energy from results
-    values = data_frame[output_columns[0]]
+    values = data_frame['Value']
     mean = np.mean(values)
     std  = np.std(values)
     print('Mean:', mean,  '+/-', std)
