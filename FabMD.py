@@ -458,9 +458,9 @@ def easymd_example_analyse(config, output_dir, **args):
     fetch_results()
     ensemble2campaign(env.local_results + "/" +
                       output_dir, my_campaign.campaign_dir)
-    my_campaign.collate()
 
-    # Print the raw data
+    # Collect output and print raw data
+    my_campaign.collate()
     print("data:", my_campaign.get_last_collation())
 
     # Create a BasicStats analysis element and apply it to the campaign
