@@ -335,6 +335,13 @@ def lammps_get_pressure(log_dir, number):
     print("READ: new_CG.prod%d.log" % (number))
     return np.average(d1), np.std(d1)  # average and stdev
 
+def get_FabMD_tmp_path():
+    """ Creates a directory within FabMD for file manipulation
+    Once simulations are completed, its contents can be removed"""
+    tmp_path = FabMD_path+"/tmp"
+    if not os.path.isdir(tmp_path):
+        os.mkdir(tmp_path)
+    return tmp_path
 
 @task
 def easymd_example(config, **args):
@@ -342,11 +349,11 @@ def easymd_example(config, **args):
     Example workflow for an EasyVVUQ, FabMD LAMMPS ensemble.
     Part 1 of 2, this builds ensemble and submits the simulations
 
+    documentation can be found in FabMD/doc/EasyVVUQ_FabMD_example.md
+
     config : config directory to use that contains input files
     Keyword arguments:
             cores : number of compute cores to request
-            images : number of images to take
-            steering : steering session i.d.
             wall_time : wall-time job limit
             memory : memory per node
     """
@@ -356,33 +363,66 @@ def easymd_example(config, **args):
     config_dir = find_config_file_path(config)
 
     # need a tmp folder for EasyVVUQ
-    tmp_path = FabMD_path+"/tmp"
-    if not os.path.isdir(tmp_path):
-        os.mkdir(tmp_path)
-
-    # Input file containing information about parameters of interest
-    easyvvuq_input = config_dir + "/ensemble_input.json"
+    tmp_path = get_FabMD_tmp_path()
 
     # Initialize `Campaign` object
-    my_campaign = uq.Campaign(state_filename=easyvvuq_input, workdir=tmp_path)
+    my_campaign = uq.Campaign(name="lammps_example", work_dir=tmp_path)
+
+    params = {
+        "velocity_seed"  : {
+            "type": "int",
+            "min": "1",
+            "max": "1e6",
+            "default":"1"},
+        "data_file": {
+            "type": "fixture",
+            "options": "data_file",
+            "default": "data_file"},
+        "out_file": {
+            "type": "str",
+            "default": "out.csv"}}
+
+    fixtures = {
+        "data_file": {
+            "type": "file",
+            "path": config_dir + "/data.peptide",
+            "common": False,
+            "exists_local": True,
+            "target": "", "group": ""}}
+
+    # Input file containing information about parameters of interest
+    easyvvuq_template = config_dir + "/lammps.template"
+    easyvvuq_target = "in.lammps"
+    encoder = uq.encoders.GenericEncoder(template_fname=easyvvuq_template,
+                                         target_filename=easyvvuq_target,
+                                         delimiter="@")
+
+    decoder = uq.decoders.SimpleCSV(
+            target_filename="out.csv",
+            output_columns=["solvation_energy"],
+            header=0)
+
+    collation = uq.collate.AggregateSamples(average=True)
+
+    # Add the cannonsim app
+    my_campaign.add_app(name="lammps_example",
+                        params=params,
+                        encoder=encoder,
+                        decoder=decoder,
+                        collation=collation,
+                        fixtures=fixtures
+                        )
 
     # Set parameters to vary: velocity seed will be a random integer
-    my_campaign.vary_param("velocity_seed",
-                           dist=uq.distributions.uniform_integer(1, 1000000))
+    vary = {"velocity_seed": uq.distributions.uniform_integer(1,1000000)}
 
-    # Set number of runs where velocity_seed is varyied acording to the
-    # above distribution. If multiple parameters
-    number_of_samples = 5
-    random_sampler = uq.elements.sampling.RandomSampler(my_campaign)
-    my_campaign.add_runs(random_sampler, max_num=number_of_samples)
+    my_sampler = uq.sampling.RandomSampler(vary=vary)
 
-    # only run one with each velocity_seed
-    replicator = uq.elements.sampling.Replicate(my_campaign, replicates=1)
-    my_campaign.add_runs(replicator)
+    my_campaign.set_sampler(my_sampler)
 
-    # Create directories containing inputs for each run containing the
-    # parameters determined by the `Sampler`(s).
-    # This makes use of the `Encoder` specified in the input file.
+    my_campaign.draw_samples(num_samples=5, replicas=1)
+
+    # Encode all runs into a director in the tmp_path
     my_campaign.populate_runs_dir()
 
     # Save campaign state for later analysis step
@@ -392,8 +432,7 @@ def easymd_example(config, **args):
     campaign2ensemble(config, campaign_dir=my_campaign.campaign_dir)
 
     # Execute lammps ensemble job
-    lammps_ensemble(config, input_name_in_config="in.lammps")
-
+    lammps_ensemble(config, input_name_in_config=easyvvuq_target)
 
 @task
 def easymd_example_analyse(config, output_dir, **args):
@@ -409,33 +448,23 @@ def easymd_example_analyse(config, output_dir, **args):
     update_environment(args)
     with_config(config)
     config_dir = find_config_file_path(config)
+    tmp_path = get_FabMD_tmp_path()
 
     # Reload EasyVVUQ campaign state
     my_campaign = uq.Campaign(
-        state_filename=config_dir+'/save_campaign_state.json')
+        state_file=config_dir+"/save_campaign_state.json", work_dir=tmp_path)
 
     # Retrive results from execution machine and put them back into a campaign
     fetch_results()
-    ensemble2campaign(env.local_results + '/' +
+    ensemble2campaign(env.local_results + "/" +
                       output_dir, my_campaign.campaign_dir)
+    my_campaign.collate()
 
-    # Aggregate the results from all runs.
-    # This makes use of the `Decoder` selected in the input file to interpret
-    # the run output and produce summary pandas dataframe.
-    output_filename = my_campaign.params_info['out_file']['default']
-    output_columns = ['Value']
-    aggregate = uq.elements.collate.AggregateSamples(
-        my_campaign,
-        output_columns=output_columns,
-        output_filename=output_filename,
-        header=0,
-        average=True
-    )
-    data_frame = aggregate.apply()
-    print(data_frame)
+    # Print the raw data
+    print("data:", my_campaign.get_last_collation())
 
-    # Calculate average energy from results
-    values = data_frame['Value']
-    mean = np.mean(values)
-    std = np.std(values)
-    print('Mean:', mean,  '+/-', std)
+    # Create a BasicStats analysis element and apply it to the campaign
+    stats = uq.analysis.BasicStats(qoi_cols=["solvation_energy"])
+    my_campaign.apply_analysis(stats)
+    print("stats:", my_campaign.get_last_analysis())
+
