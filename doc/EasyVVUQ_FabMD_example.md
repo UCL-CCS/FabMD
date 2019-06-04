@@ -22,7 +22,7 @@ These are the commands I needed to run this example:
 
 ```
 fab archer easymd_example:fabmd_easyvvuq
-fab archer monitor - (wait until execution has finished)
+fab archer monitor  # wait until execution has finished
 fab archer easymd_example_analyse:fabmd_easyvvuq,fabmd_easyvvuq_archer_24
 ```
 
@@ -31,7 +31,7 @@ The generalised commands are:
 
 ```
 fab remote_machine easymd_example:config_dir
-fab remote_machine monitor - (wait until execution has finished)
+fab remote_machine monitor # wait until execution has finished
 fab remote_machine easymd_example_analyse:config_dir,output_dir
 ```
 
