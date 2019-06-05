@@ -1,5 +1,7 @@
 # EasyVVUQ + FabMD example
 
+## As of 5th June, this example only works with the EasyVVUQ dev branch
+
 ### Overview
 
 This example shows how to create an ensemble of LAMMPS simulations using [EassyVVUQ](https://github.com/UCL-CCS/EasyVVUQ), execute the jobs through FabMD, then analyse them within the EasyVVUQ architecture. All within 3 FabSim commands!!!
