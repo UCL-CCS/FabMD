@@ -10,7 +10,7 @@ Its a very simple example of a LAMMPS ensemble. 5 replicas are created and given
 
 The input files needed for this example are found in `FabMD/config_files/fabmd_easyvvuq`. This directory contains three files:
 
-+ `in.lammps`: is the LAMMPS input script, EasyVVUQ will substitute certain variables in this file to create the ensemble. 
++ `lammps.template`: is the LAMMPS input script, EasyVVUQ will substitute certain variables in this file to create the ensemble. 
 
 + `data.peptide`: is the configuration file for a peptide in water for LAMMPS simulation. This remains common to all simulations.
 
