@@ -12,8 +12,6 @@ The input files needed for this example are found in `FabMD/config_files/fabmd_e
 
 + `in.lammps`: is the LAMMPS input script, EasyVVUQ will substitute certain variables in this file to create the ensemble. 
 
-+ `ensemble_input.json`: EasyVVUQ input file. 
-
 + `data.peptide`: is the configuration file for a peptide in water for LAMMPS simulation. This remains common to all simulations.
 
 For this example it is assumed you can run the basic FabMD and EasyVVUQ examples.
@@ -24,7 +22,7 @@ These are the commands I needed to run this example:
 
 ```
 fab archer easymd_example:fabmd_easyvvuq
-fab archer monitor  # wait until execution has finished
+fab archer job_stat  # wait until execution has finished
 fab archer easymd_example_analyse:fabmd_easyvvuq,fabmd_easyvvuq_archer_24
 ```
 
@@ -33,7 +31,7 @@ The generalised commands are:
 
 ```
 fab remote_machine easymd_example:config_dir
-fab remote_machine monitor # wait until execution has finished
+fab remote_machine job_stat # wait until execution has finished
 fab remote_machine easymd_example_analyse:config_dir,output_dir
 ```
 
@@ -47,9 +45,11 @@ The first command `easymd_example` calls a function in `FabMD.py`. This sets up 
 
 EasyVVUQ requires a separate place to store the run information, this is put in a `FabMD/tmp/`. 
 
-We vary the random seed that LAMMPS uses to generate atomic velocities with: `my_campaign.vary_param("velocity_seed", dist=uq.distributions.uniform_integer(1,1000000))` 
+An EasyVVUQ campagin is created in the usual way, we use a fixture to copy `data.peptide` to all directories.
 
-Note that EasyVVUQ by default uses a `$` to identify variables to carry out variable substitution, however `$` is used by LAMMPS so we escape this clash by defining the delimiter to `@` in `ensemble_input.json` with the line: `"encoder_delimiter": "@" `
+Note that EasyVVUQ by default uses a `$` to identify variables to carry out variable substitution, however `$` is used by LAMMPS so we escape this clash by defining the delimiter to `@`.
+
+We vary the random seed that LAMMPS uses to generate atomic velocities with: `vary = {"velocity_seed": uq.distributions.uniform_integer(1,1000000)}` 
 
 We sample 5 different velocity seeds and replicate each only once because given a specific seed the answer is deterministic. If you were varying a separate parameter that had a stochasitc ouput you would add replicas to each sample.
 
@@ -69,8 +69,8 @@ This command does the equivalent of:
 
 + fetching the results from the remote machine
 + convert FabSim ensemble to EasyVVUQ campaign
-+ aggregate results into a pandas dataframe
++ collate results into a pandas dataframe
 + print all the information of from the campaign
-+ prints the mean and standard deviation of the solvation energies
++ prints the `BasicStats` on the solvation energy, including its mean and confidence intervals
 
 
