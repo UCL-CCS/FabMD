@@ -402,14 +402,14 @@ def easymd_example(config, **args):
             output_columns=["solvation_energy"],
             header=0)
 
-    collation = uq.collate.AggregateSamples(average=True)
+    collater = uq.collate.AggregateSamples(average=False)
+    my_campaign.set_collater(collater)
 
     # Add the cannonsim app
     my_campaign.add_app(name="lammps_example",
                         params=params,
                         encoder=encoder,
                         decoder=decoder,
-                        collation=collation,
                         fixtures=fixtures
                         )
 
