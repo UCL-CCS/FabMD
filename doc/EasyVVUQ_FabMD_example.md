@@ -4,7 +4,7 @@
 
 ### Overview
 
-This example shows how to create an ensemble of LAMMPS simulations using [EassyVVUQ](https://github.com/UCL-CCS/EasyVVUQ), execute the jobs through FabMD, then analyse them within the EasyVVUQ architecture. All within 3 FabSim commands!!!
+This example shows how to create an ensemble of LAMMPS simulations using [EasyVVUQ](https://github.com/UCL-CCS/EasyVVUQ), execute the jobs through FabMD, then analyse them within the EasyVVUQ architecture. All within 3 FabSim commands!!!
 
 Its a very simple example of a LAMMPS ensemble. 5 replicas are created and given different velocity seeds. The solvation energy is calculated at the end of each simulation and the average and standard deviation are output to screen. The intention for this example is to provide a guide to designing your own workflow that uses these two tools together. 
 
