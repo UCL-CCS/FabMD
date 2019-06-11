@@ -21,18 +21,18 @@ For this example it is assumed you can run the basic FabMD and EasyVVUQ examples
 These are the commands I needed to run this example:
 
 ```
-fab archer easymd_example:fabmd_easyvvuq
-fab archer job_stat  # wait until execution has finished
-fab archer easymd_example_analyse:fabmd_easyvvuq,fabmd_easyvvuq_archer_24
+fabsim archer easymd_example:fabmd_easyvvuq
+fabsim archer job_stat  # wait until execution has finished
+fabsim archer easymd_example_analyse:fabmd_easyvvuq,fabmd_easyvvuq_archer_24
 ```
 
 ---
 The generalised commands are:
 
 ```
-fab remote_machine easymd_example:config_dir
-fab remote_machine job_stat # wait until execution has finished
-fab remote_machine easymd_example_analyse:config_dir,output_dir
+fabsim remote_machine easymd_example:config_dir
+fabsim remote_machine job_stat # wait until execution has finished
+fabsim remote_machine easymd_example_analyse:config_dir,output_dir
 ```
 
 ### Command explanation
@@ -57,7 +57,7 @@ Then we save the campagin state for later, convert the campaign to a `FabSim` en
 
 ---
 
-The second command is used to check when the simulatinos have completed. You could also use `fab remote_machine stat`.
+The second command is used to check when the simulatinos have completed. You could also use `fabsim remote_machine stat`.
 
 ---
 
