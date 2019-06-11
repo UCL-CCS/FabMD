@@ -8,7 +8,7 @@ This example shows how to create an ensemble of LAMMPS simulations using [EasyVV
 
 Its a very simple example of a LAMMPS ensemble. 5 replicas are created and given different velocity seeds. The solvation energy is calculated at the end of each simulation and the average and standard deviation are output to screen. The intention for this example is to provide a guide to designing your own workflow that uses these two tools together. 
 
-The input files needed for this example are found in `FabMD/config_files/fabmd_easyvvuq`. This directory contains three files:
+The input files needed for this example are found in `plugins/FabMD/config_files/fabmd_easyvvuq`. This directory contains three files:
 
 + `lammps.template`: is the LAMMPS input script, EasyVVUQ will substitute certain variables in this file to create the ensemble. 
 
@@ -30,9 +30,9 @@ fabsim archer easymd_example_analyse:fabmd_easyvvuq,fabmd_easyvvuq_archer_24
 The generalised commands are:
 
 ```
-fabsim remote_machine easymd_example:config_dir
+fabsim remote_machine easymd_example:(name of config_dir in config_files)
 fabsim remote_machine job_stat # wait until execution has finished
-fabsim remote_machine easymd_example_analyse:config_dir,output_dir
+fabsim remote_machine easymd_example_analyse:(name of config_dir in config_files),(name of output_dir)
 ```
 
 ### Command explanation
@@ -63,7 +63,7 @@ The second command is used to check when the simulatinos have completed. You cou
 
 The third command `easymd_example_analyse` calls a function in `FabMD.py`. This fetches the results, transfers it back to an EasyVVUQ campaign and then analyses it. It must be passed two arguments: the `config_dir` as usual; and the name of the results directory `output_dir`. `output_dir` will be the name of the directory containg the results in your `local_results` directory (set in your `machines_user.yml` file).
 
-Note that we have made LAMMPS output a file that looks like a pnadas dataframse csv file, a more general output could be read by EasyVVUQ by using a custom decoder. 
+Note that we have made LAMMPS output a file that looks like a pandas dataframse csv file, a more general output could be read by EasyVVUQ by using a custom decoder. 
 
 This command does the equivalent of:
 
