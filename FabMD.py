@@ -461,7 +461,7 @@ def easymd_example_analyse(config, output_dir, **args):
 
     # Collect output and print raw data
     my_campaign.collate()
-    print("data:", my_campaign.get_last_collation())
+    print("data:", my_campaign.get_collation_result())
 
     # Create a BasicStats analysis element and apply it to the campaign
     stats = uq.analysis.BasicStats(qoi_cols=["solvation_energy"])
