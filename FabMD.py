@@ -18,16 +18,16 @@ FabMD_path = get_plugin_path('FabMD')
 
 @task
 def lammps(config, **args):
-    md_job(config, 'lammps', args)
+    md_job(config, 'lammps', **args)
 
 
 @task
 def gromacs(config, **args):
-    env.grompp_command = make_grompp_command(config, args)
-    md_job(config, 'gromacs', args)
+    env.grompp_command = make_grompp_command(config, **args)
+    md_job(config, 'gromacs', **args)
 
 
-def md_job(config, script, args):
+def md_job(config, script, **args):
     """Submit an MD job to the remote queue with a given script; e.g. LAMMPS
     The job results will be stored with a name pattern as defined in the
     environment, e.g. cylinder-abcd1234-legion-256
@@ -57,7 +57,7 @@ def lammps_ensemble(config, sweep_dir=False, **kwargs):
 
 @task
 def gromacs_ensemble(config, sweep_dir=False, **kwargs):
-    env.grompp_command = make_grompp_command(config, args)
+    env.grompp_command = make_grompp_command(config, kwargs)
     md_ensemble(config, 'gromacs', sweep_dir, kwargs)
 
 
