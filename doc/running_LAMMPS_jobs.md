@@ -6,10 +6,10 @@ All the input files required for a LAMMPS simulation should be contained in a di
 
 A minimal example LAMMPS simulation is provided in ``config_files/lammps_test1``, to execute this example type:
 
-``fab localhost lammps:lammps_test1``
+``fabsim localhost lammps:lammps_test1``
 
 Modifications can be added in the command line like:
 
-```fab host lammps:lammps_test1,lammps_input:in.lammps,wall_time:1:00:00,cores=1```
+```fabsim host lammps:lammps_test1,lammps_input:in.lammps,wall_time:1:00:00,cores=1```
 
 or by specifiying default values for these arguments in: ``FabMD/default_settings/lammps.yaml``. 

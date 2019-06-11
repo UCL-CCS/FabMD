@@ -42,7 +42,7 @@ There are two optional files that, if desired, must be specified on the command 
 
 These could be specifed like this:
 ```
-fab localhost gromacs:gromacs_test,grompp=nvt.mdp,conf=npt4b.gro,topol=top.top,checkpoint=npt4b.cpt,index=index.ndx
+fabsim localhost gromacs:gromacs_test,grompp=nvt.mdp,conf=npt4b.gro,topol=top.top,checkpoint=npt4b.cpt,index=index.ndx
 ```
 
 The grompp command executes with all required and optional files. This produces a `mdout.mdp` file which is run with:
