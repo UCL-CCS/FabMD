@@ -52,7 +52,7 @@ def md_job(config, script, args):
 
 @task
 def lammps_ensemble(config, sweep_dir=False, **kwargs):
-    md_ensemble(config, 'lammps', sweep_dir, kwargs)
+    md_ensemble(config, 'lammps', sweep_dir, **kwargs)
 
 
 @task
@@ -61,7 +61,7 @@ def gromacs_ensemble(config, sweep_dir=False, **kwargs):
     md_ensemble(config, 'gromacs', sweep_dir, kwargs)
 
 
-def md_ensemble(config, script, sweep_dir, kwargs):
+def md_ensemble(config, script, sweep_dir, **kwargs):
     defaults = yaml.load(open(FabMD_path+'/default_settings/'+script+'.yaml'))
     ensemble_args = dict(script=script,
                          wall_time=defaults['wall_time'],
