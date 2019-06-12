@@ -1,5 +1,17 @@
 # Run Ensemble Examples
 
+### lammps_ensemble_example1
+
+These examples assume that you have been able to run the basic FabSim examples described in the other documentation files, and that you have installed and configured LAMMPS on the target machine.
+
+To run type:
+```
+fabsim localhost lammps_ensemble:lammps_ensemble_example1
+```
+
+FabMD looks for a directory called `lammps_ensemble_example1` in `config_files`. It then looks for a sweep directory (by default called `SWEEP`) that contains a number of input files to iterate through. All the files in `lammps_ensemble_example1` directory and one of the sweep directory files will be copied to the host in separate directories (one for each sweep file) and executed in the normal way. 
+This example essentially runs the same input script with different topology (data) files.
+
 ### lammps_ensemble_example2
 
 This example runs 3 simulations with different input files, which vary the simulation temperature, using the same topology file.
