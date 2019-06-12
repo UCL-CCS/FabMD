@@ -432,7 +432,7 @@ def easymd_example(config, **args):
     campaign2ensemble(config, campaign_dir=my_campaign.campaign_dir)
 
     # Execute lammps ensemble job
-    lammps_ensemble(config, input_name_in_config=easyvvuq_target)
+    lammps_ensemble(config, input_name_in_config=easyvvuq_target, **args)
 
 @task
 def easymd_example_analyse(config, output_dir, **args):
