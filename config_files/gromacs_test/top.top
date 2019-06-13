@@ -1,0 +1,28 @@
+#include "martini_v2.1P-dna.itp"
+#include "martini_v2.0_ions.itp"
+#include "POPC.itp"
+
+#define RUBBER_BANDS
+
+#include "Nucleic_A_chol+Nucleic_B_new.itp"
+#include "Nucleic_C_chol_new.itp"
+#include "Nucleic_D.itp"
+#include "Nucleic_E_chol_new.itp"
+#include "Nucleic_F.itp"
+
+[ system ]
+; name
+DNA in INSANE! Membrane UpperLeaflet>POPC=1 LowerLeaflet>POPC=1
+
+[ molecules ]
+; name  number
+Nucleic_A+Nucleic_B     1
+Nucleic_C        1
+Nucleic_D        1
+Nucleic_E        1
+Nucleic_F        1
+POPC           563
+POPC           552
+PW           28024
+NA            2418
+CL            2121
