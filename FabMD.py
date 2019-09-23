@@ -468,3 +468,5 @@ def easymd_example_analyse(config, output_dir, **args):
     my_campaign.apply_analysis(stats)
     print("stats:", my_campaign.get_last_analysis())
 
+
+from plugins.FabFlee.gromacs_ensembles import *
