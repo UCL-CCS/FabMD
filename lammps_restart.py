@@ -1,5 +1,6 @@
 from base.fab import *
 from plugins.FabMD.FabMD import *
+import time
 
 @task
 def lammps_restart(config, results_dir, **args):
@@ -26,3 +27,16 @@ def lammps_restart(config, results_dir, **args):
     md_job(config, 'lammps', lammps_input="restart.{}".format(env.lammps_input), label=env.label, run_prefix_commands=env.run_prefix_commands, previous_job_results=pjr, **args)
 
 
+@task
+def lammps_wait_complete():
+    time.sleep(60):
+    while run(template(env.stat)) != "":
+        time.sleep(120)
+
+def lammps_babysit(config, **args)
+    lammps(config, **args)
+    lammps_wait_complete()
+    #for i in range(0,9):
+    #    results_dir = ""
+    #    lammps_restart(config, results_dir, **args)
+    #    lammps_wait_complete()
