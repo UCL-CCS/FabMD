@@ -39,5 +39,5 @@ def lammps_babysit(config, **args):
     results_dir = lammps(config, **args)
     lammps_wait_complete()
     for i in range(0,9):
-        results_dir = lammps_restart(config, results_dir, **args)
+        results_dir = lammps_restart(config, results_dir.split("/")[-1], **args)
         lammps_wait_complete()
