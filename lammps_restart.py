@@ -4,7 +4,7 @@ from plugins.FabMD.FabMD import *
 @task
 def lammps_restart(config, **args):
     update_environment(args)
-    update_environment(dict(lammps_input="restart.{}".format(env.lammps_input))
+    update_environment(dict(lammps_input="restart.{}".format(env.lammps_input)))
     md_job(config, 'lammps', **args)
 
     """
