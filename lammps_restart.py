@@ -33,7 +33,7 @@ def lammps_wait_complete():
     while run(template(env.stat)) != "":
         time.sleep(120)
 
-def lammps_babysit(config, **args)
+def lammps_babysit(config, **args):
     lammps(config, **args)
     lammps_wait_complete()
     #for i in range(0,9):
