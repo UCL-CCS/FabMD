@@ -29,7 +29,7 @@ def lammps_restart(config, results_dir, **args):
 
 @task
 def lammps_wait_complete():
-    time.sleep(60):
+    time.sleep(60)
     while run(template(env.stat)) != "":
         time.sleep(120)
 
