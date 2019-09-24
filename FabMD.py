@@ -8,8 +8,6 @@
 
 from base.fab import *
 
-# from plugins.FabMD.user_workflows import *
-
 # Add local script, blackbox and template path.
 add_local_paths("FabMD")
 
@@ -469,5 +467,5 @@ def easymd_example_analyse(config, output_dir, **args):
     print("stats:", my_campaign.get_last_analysis())
 
 
-from plugins.FabFlee.gromacs_ensembles import *
-from plugins.FabFlee.lammps_restart import *
+from plugins.FabMD.gromacs_ensembles import *
+from plugins.FabMD.lammps_restart import *
