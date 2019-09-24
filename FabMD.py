@@ -470,3 +470,4 @@ def easymd_example_analyse(config, output_dir, **args):
 
 
 from plugins.FabFlee.gromacs_ensembles import *
+from plugins.FabFlee.lammps_restart import *
