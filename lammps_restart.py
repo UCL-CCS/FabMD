@@ -33,6 +33,8 @@ def lammps_wait_complete():
     while run(template(env.stat)) != "":
         time.sleep(120)
 
+
+@task
 def lammps_babysit(config, **args):
     lammps(config, **args)
     lammps_wait_complete()
