@@ -82,7 +82,7 @@ def md_ensemble(config, script, sweep_dir, **kwargs):
     run_ensemble(config, sweep_dir, **ensemble_args)
 
 
-def make_grompp_command(config, args):
+def make_grompp_command(config, **args):
     config_dir = find_config_file_path(config)
     required_files = {'grompp': {'extension': '.mdp', 'flag': 'f'},
                       'conf': {'extension': '.gro', 'flag': 'c'},
