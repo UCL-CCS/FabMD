@@ -18,6 +18,11 @@ def lammps_restart(config, results_dir, **args):
     else:
         env.label = "restart_{}".format(job_number)
 
-    md_job(config, 'lammps', lammps_input="restart.{}".format(env.lammps_input), label=env.label, **args)
+    # Assumption: runs are continued on the same machine.
+    env.run_prefix_commands = ["cp -r $previous_job_results/lammps.restart $job_results/"]
+    
+    pjr = "{}/../{}".format("$job_results", results_dir)
+
+    md_job(config, 'lammps', lammps_input="restart.{}".format(env.lammps_input), label=env.label, run_prefix_commands=env.run_prefix_commands, previous_job_results=pjr, **args)
 
 
