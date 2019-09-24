@@ -3,7 +3,7 @@ from plugins.FabMD.FabMD import *
 
 @task
 def lammps_restart(config, **args):
-    defaults = yaml.load(open(FabMD_path+'/default_settings/'+script+'.yaml'))
+    defaults = yaml.load(open(FabMD_path+'/default_settings/lammps.yaml'))
     update_environment(defaults)
     update_environment(args)
     update_environment(dict(lammps_input="restart.{}".format(env.lammps_input)))
