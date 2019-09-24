@@ -38,7 +38,6 @@ def lammps_wait_complete():
 def lammps_babysit(config, **args):
     lammps(config, **args)
     lammps_wait_complete()
-    #for i in range(0,9):
-    #    results_dir = ""
-    #    lammps_restart(config, results_dir, **args)
-    #    lammps_wait_complete()
+    for i in range(0,9):
+        lammps_restart(config, env.results_dir, **args)
+        lammps_wait_complete()
