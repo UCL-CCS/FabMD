@@ -24,7 +24,7 @@ def lammps_restart(config, results_dir, **args):
     
     pjr = "{}/../{}".format("$job_results", results_dir)
 
-    md_job(config, 'lammps', lammps_input="restart.{}".format(env.lammps_input), label=env.label, run_prefix_commands=env.run_prefix_commands, previous_job_results=pjr, **args)
+    return md_job(config, 'lammps', lammps_input="restart.{}".format(env.lammps_input), label=env.label, run_prefix_commands=env.run_prefix_commands, previous_job_results=pjr, **args)
 
 
 @task
@@ -36,8 +36,8 @@ def lammps_wait_complete():
 
 @task
 def lammps_babysit(config, **args):
-    lammps(config, **args)
+    results_dir = lammps(config, **args)
     lammps_wait_complete()
     for i in range(0,9):
-        lammps_restart(config, env.results_dir, **args)
+        results_dir = lammps_restart(config, results_dir, **args)
         lammps_wait_complete()

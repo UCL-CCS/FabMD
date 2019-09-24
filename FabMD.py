@@ -16,13 +16,13 @@ FabMD_path = get_plugin_path('FabMD')
 
 @task
 def lammps(config, **args):
-    md_job(config, 'lammps', **args)
+    return md_job(config, 'lammps', **args)
 
 
 @task
 def gromacs(config, **args):
     env.grompp_command = make_grompp_command(config, **args)
-    md_job(config, 'gromacs', **args)
+    return md_job(config, 'gromacs', **args)
 
 
 def md_job(config, script, **args):
@@ -40,7 +40,7 @@ def md_job(config, script, **args):
     with_config(config)
     execute(put_configs, config)
     defaults = yaml.load(open(FabMD_path+'/default_settings/'+script+'.yaml'))
-    job(dict(script=script,
+    return job(dict(script=script,
              wall_time=defaults['wall_time'],
              lammps_input=defaults['lammps_input'],
              cores=defaults['cores'],
