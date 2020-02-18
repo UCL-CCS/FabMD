@@ -10,7 +10,7 @@ dihedral_style  charmm
 improper_style  harmonic
 kspace_style	pppm 0.0001
 
-read_data	@data_file
+read_data	data.peptide
 
 neighbor	2.0 bin
 neigh_modify	delay 5
@@ -34,5 +34,5 @@ thermo		50
 
 run 1000
 
-print "solvation_energy" file @out_file
-print "${my_solvation_energy}" append @out_file
+print "solvation_energy" file output.csv
+print "${my_solvation_energy}" append output.csv

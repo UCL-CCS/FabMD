@@ -8,6 +8,7 @@
 
 from base.fab import *
 
+
 # Add local script, blackbox and template path.
 add_local_paths("FabMD")
 
@@ -356,6 +357,9 @@ def easymd_example(config, **args):
             memory : memory per node
     """
     import easyvvuq as uq
+    import chaospy as cp
+    from pprint import pprint
+
     update_environment(args)
     with_config(config)
     config_dir = find_config_file_path(config)
@@ -368,60 +372,43 @@ def easymd_example(config, **args):
 
     params = {
         "velocity_seed"  : {
-            "type": "int",
+            "type": "integer",
             "min": "1",
             "max": "1e6",
-            "default":"1"},
-        "data_file": {
-            "type": "fixture",
-            "options": "data_file",
-            "default": "data_file"},
-        "out_file": {
-            "type": "str",
-            "default": "out.csv"}}
+            "default":"1"}
+    }
 
-    fixtures = {
-        "data_file": {
-            "type": "file",
-            "path": config_dir + "/data.peptide",
-            "common": False,
-            "exists_local": True,
-            "target": "", "group": ""}}
-
-    # Input file containing information about parameters of interest
-    easyvvuq_template = config_dir + "/lammps.template"
-    easyvvuq_target = "in.lammps"
-    encoder = uq.encoders.GenericEncoder(template_fname=easyvvuq_template,
-                                         target_filename=easyvvuq_target,
-                                         delimiter="@")
+    input_file_target = 'in.lammps'
+    encoder = uq.encoders.GenericEncoder(
+            template_fname=config_dir + '/lammps.template',
+            delimiter='@',
+            target_filename=input_file_target)
 
     decoder = uq.decoders.SimpleCSV(
-            target_filename="out.csv",
-            output_columns=["solvation_energy"],
+            target_filename='output.csv',
+            output_columns=['solvation_energy'],
             header=0)
 
     collater = uq.collate.AggregateSamples(average=False)
-    my_campaign.set_collater(collater)
 
-    # Add the cannonsim app
     my_campaign.add_app(name="lammps_example",
-                        params=params,
-                        encoder=encoder,
-                        decoder=decoder,
-                        fixtures=fixtures
-                        )
+            params=params,
+            encoder=encoder,
+            decoder=decoder,
+            collater=collater)
 
     # Set parameters to vary: velocity seed will be a random integer
-    vary = {"velocity_seed": uq.distributions.uniform_integer(1,1000000)}
+    random_seed = uq.sampling.RandomSampler(
+            vary={"velocity_seed": cp.DiscreteUniform(0, 100000000)},
+            max_num=3
+    )
+    my_campaign.set_sampler(random_seed)
 
-    my_sampler = uq.sampling.RandomSampler(vary=vary)
-
-    my_campaign.set_sampler(my_sampler)
-
-    my_campaign.draw_samples(num_samples=5, replicas=1)
+    my_campaign.draw_samples()
 
     # Encode all runs into a director in the tmp_path
     my_campaign.populate_runs_dir()
+    pprint(my_campaign.list_runs())
 
     # Save campaign state for later analysis step
     my_campaign.save_state(config_dir+'/save_campaign_state.json')
@@ -430,7 +417,7 @@ def easymd_example(config, **args):
     campaign2ensemble(config, campaign_dir=my_campaign.campaign_dir)
 
     # Execute lammps ensemble job
-    lammps_ensemble(config, input_name_in_config=easyvvuq_target, **args)
+    lammps_ensemble(config, input_name_in_config=input_file_target, **args)
 
 @task
 def easymd_example_analyse(config, output_dir, **args):
