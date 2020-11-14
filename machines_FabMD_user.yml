@@ -1,0 +1,28 @@
+# This is the user personal configuration for job submission and execution for FabCovid19 plugin
+# All given variable here will be override machine settings loaded from (a) FabSim3/deploy/machines.yml and (b) FabSim3/deploy/machines_user.yml 
+# 
+# Here, you can find some examples for pre-defined remote machines
+# All env variable can be modified here and will overwrite setting in machines.yml and machines_user.yml
+default:
+  lammps_params:
+    lammps_input: "in.lammps"
+    #wall_time: "0:10:00"    
+    sweep_dir_name: "SWEEP"    
+
+  gromacs_params:
+    sweep_dir_name: "SWEEP"
+    required_files:
+        grompp: nvt.mdp
+        conf: npt4b.gro
+        topol: top.top
+        checkpoint:
+        index: index.ndx
+
+
+localhost:
+  # location of lmp_serial in your local PC
+  lammps_exec: "/home/hamid/lammps/src/lmp_serial"
+  gromacs_exec: "/usr/local/gromacs/bin/gmx"
+  # used core for executing lmp_serial on your local PC
+  cores: 1
+

@@ -7,7 +7,8 @@
 # This file contains FabSim definitions specific to FabNanoMD.
 
 from base.fab import *
-
+from pprint import pprint
+import os
 
 # Add local script, blackbox and template path.
 add_local_paths("FabMD")
@@ -16,71 +17,93 @@ FabMD_path = get_plugin_path('FabMD')
 
 
 @task
+@load_plugin_env_vars("FabMD")
 def lammps(config, **args):
+    """
+    fab localhost lammps:lammps_test1
+    """
+    env.update(env.lammps_params)
     return md_job(config, 'lammps', **args)
 
 
 @task
-def gromacs(config, **args):
+@load_plugin_env_vars("FabMD")
+def gromacs(config, grompp=None, conf=None, topol=None, **args):
+    """
+    fab localhost gromacs:gromacs_test
+    """
+    env.update(env.gromacs_params)
+    # overwrite env.required_files dict with user input values
+    if grompp is not None:
+        env.required_files['grompp'] = grompp
+    if conf is not None:
+        env.required_files['conf'] = conf
+    if topol is not None:
+        env.required_files['topol'] = topol
+
     env.grompp_command = make_grompp_command(config, **args)
     return md_job(config, 'gromacs', **args)
 
 
 def md_job(config, script, **args):
-    """Submit an MD job to the remote queue with a given script; e.g. LAMMPS
-    The job results will be stored with a name pattern as defined in the
-    environment, e.g. cylinder-abcd1234-legion-256
-    config : config directory to use to define geometry, e.g. config=cylinder
-    Keyword arguments:
-            cores : number of compute cores to request
-            images : number of images to take
-            steering : steering session i.d.
-            wall_time : wall-time job limit
-            memory : memory per node
     """
+    Submit an MD job
+    input args
+
+        script: 
+            input script for job execution, 
+            available scripts : lammps or gromacs
+        config:
+            config directory to use to define geometry
+            please look at /FabMD/config_files to see the available configs    
+    """
+    update_environment(args)
     with_config(config)
     execute(put_configs, config)
-    defaults = yaml.load(open(FabMD_path+'/default_settings/'+script+'.yaml'))
     return job(dict(script=script,
-             wall_time=defaults['wall_time'],
-             lammps_input=defaults['lammps_input'],
-             cores=defaults['cores'],
-             memory='2G'),
-        args)
+                    memory='2G'),
+               args)
 
 
 @task
+@load_plugin_env_vars("FabMD")
 def lammps_ensemble(config, sweep_dir=False, **kwargs):
+    '''
+        fab localhost lammps_ensemble:lammps_ensemble_example1
+        fab localhost lammps_ensemble:lammps_ensemble_example2
+
+    https://github.com/UCL-CCS/FabMD/blob/hamid-dev/doc/RunEnsemble-examples.md
+    '''
+    env.update(env.lammps_params)
     md_ensemble(config, 'lammps', sweep_dir, **kwargs)
 
 
 @task
-def gromacs_ensemble(config, sweep_dir=False, **kwargs):
+@load_plugin_env_vars("FabMD")
+def gromacs_ensemble(config, grompp=None, conf=None, topol=None,
+                     sweep_dir=False, **kwargs):
+    env.update(env.gromacs_params)
+    # overwrite env.required_files dict with user input values
+    if grompp is not None:
+        env.required_files['grompp'] = grompp
+    if conf is not None:
+        env.required_files['conf'] = conf
+    if topol is not None:
+        env.required_files['topol'] = topol
+
     env.grompp_command = make_grompp_command(config, kwargs)
     md_ensemble(config, 'gromacs', sweep_dir, kwargs)
 
 
 def md_ensemble(config, script, sweep_dir, **kwargs):
-    defaults = yaml.load(open(FabMD_path+'/default_settings/'+script+'.yaml'))
-    ensemble_args = dict(script=script,
-                         wall_time=defaults['wall_time'],
-                         lammps_input=defaults['lammps_input'],
-                         cores=defaults['cores'],
-                         memory='2G')
-    # input_name_in_config='topology.data')
-    ensemble_args.update(kwargs)
 
     # If sweep_dir not set assume it is a directory in config with default name
     if sweep_dir == False:
         path_to_config = find_config_file_path(config)
-        sweep_dir = path_to_config + "/" + defaults["sweep_dir_name"]
+        sweep_dir = os.path.join(path_to_config, env.sweep_dir_name)
 
-    #if 'input_name_in_config' not in ensemble_args:
-    #    raise RuntimeError(
-    #        'Must declare input_name_in_config: the generic name which sweep'+
-    #         'directory files will be changed to')
-
-    run_ensemble(config, sweep_dir, **ensemble_args)
+    env.script = script
+    run_ensemble(config, sweep_dir, **kwargs)
 
 
 def make_grompp_command(config, **args):
@@ -91,21 +114,14 @@ def make_grompp_command(config, **args):
     optional_files = {'checkpoint': {'extension': '.cpt', 'flag': 't'},
                       'index': {'extension': '.ndx', 'flag': 'n'}}
 
-    defaults = yaml.load(open(FabMD_path+'/default_settings/gromacs.yaml'))
-
     grompp_args = {}
     for reqfile in required_files:
         flag = required_files[reqfile]['flag']
 
-        # specified in command line?
-        if reqfile in args:
-            grompp_args[flag] = args[reqfile]
-            continue
-
         # specified as default?
-        if reqfile in defaults['required_files']:
-            if defaults['required_files'][reqfile]:
-                grompp_args[flag] = defaults['required_files'][reqfile]
+        if reqfile in env.required_files:
+            if env.required_files[reqfile]:
+                grompp_args[flag] = env.required_files[reqfile]
                 continue
 
         # find file in config directory with the correct extension?
@@ -128,17 +144,18 @@ def make_grompp_command(config, **args):
 
     for optfile in optional_files:
         flag = optional_files[optfile]['flag']
-        # specified in command line?
-        if optfile in args:
-            grompp_args[flag] = args[optfile]
-            continue
+        if optfile in env.required_files:
+            if env.required_files[optfile]:
+                grompp_args[flag] = env.required_files[optfile]
+                continue
 
     grompp_command = ''
     for arg in grompp_args:
-        grompp_command += '-'+arg+' '+grompp_args[arg]+' '
+        grompp_command += '-' + arg + ' ' + grompp_args[arg] + ' '
     print('grompp arguments = ', grompp_command)
     return grompp_command
 
+'''
 
 @task
 def lammps_epoxy(config, **args):
@@ -192,7 +209,10 @@ def lammps_epoxy(config, **args):
 
 
 @task
-def do_ibi(number, outdir, pressure=1, config_name="peg", copy="yes", ibi_script="ibi.sh", atom_dir=os.path.join(env.localroot, 'python')):
+@load_plugin_env_vars("FabMD")
+def do_ibi(number, outdir, pressure=1, config_name="peg", copy="yes",
+           ibi_script="ibi.sh",
+           atom_dir=os.path.join(env.localroot, 'python')):
     """ Copy the obtained output to a work directory, do an IBI iteration and make a new config file from the resulting data. """
     ibi_in_dir = os.path.join(env.localroot, 'results', outdir)
     ibi_out_dir = os.path.join(
@@ -205,7 +225,7 @@ def do_ibi(number, outdir, pressure=1, config_name="peg", copy="yes", ibi_script
              (atom_dir, number, pressure, ibi_in_dir, ibi_out_dir))
     if copy == "yes":
         blackbox("prepare_lammps_config.sh", "%s %s %s %d %s" % (ibi_out_dir, os.path.join(
-            env.localroot, 'config_files'), config_name, int(number)+1, atom_dir))
+            env.localroot, 'config_files'), config_name, int(number) + 1, atom_dir))
 
 
 @task
@@ -223,7 +243,7 @@ def do_pmf(number, outdir, atom_type1, atom_type2, config_name="peg", copy="yes"
                                                     number, pmf_in_dir, pmf_out_dir, atom_dir, ibi_script_dir))
     if copy == "yes":
         blackbox("prepare_lammps_config_pmf.sh", "%s %s %s %d %s " % (pmf_out_dir, os.path.join(
-            env.localroot, 'config_files'), config_name, int(number)+1, atom_dir))
+            env.localroot, 'config_files'), config_name, int(number) + 1, atom_dir))
 
 
 @task
@@ -232,7 +252,7 @@ def ibi_analysis_multi(start_iter, num_iters, outdir_prefix, outdir_suffix, ibi_
     Example use: fab hector ibi_analysis_multi:start_iter=7,num_iters=3,outdir_prefix=peg_,outdir_suffix=_hector_32 """
     si = int(start_iter)
     ni = int(num_iters)
-    for i in xrange(si, si+ni):
+    for i in xrange(si, si + ni):
         outdir = "%s%d%s" % (outdir_prefix, i, outdir_suffix)
         do_ibi(i, outdir, pressure, outdir_prefix, "no", ibi_script, atom_dir)
 
@@ -262,7 +282,7 @@ def full_pmf(config, number, outdir, config_name, atom_type1, atom_type2, pmf_sc
            config_name, "yes", pmf_script, atom_dir)
     print("PMF script finished. Launching LAMMPS.")
     update_environment(args)
-    env.lammps_args = "-partition %sx%s" % (int(env.cores)/int(
+    env.lammps_args = "-partition %sx%s" % (int(env.cores) / int(
         env.cores_per_replica), int(env.cores_per_replica))
     lammps(config, **args)
     wait_complete()
@@ -283,9 +303,9 @@ def full_ibi_multi(start_iter, num_iters, config_name, outdir_suffix, pressure=0
 
     pressure_changed = 0
 
-    for i in xrange(si, si+ni):
-        full_ibi("%s%d" % (config_name, i+1), i, "%s%d%s" % (config_name, i,
-                                                             outdir_suffix), config_name, pressure, script, atom_dir, **args)
+    for i in xrange(si, si + ni):
+        full_ibi("%s%d" % (config_name, i + 1), i, "%s%d%s" % (config_name, i,
+                                                               outdir_suffix), config_name, pressure, script, atom_dir, **args)
 
         p_ave, p_std = lammps_get_pressure(os.path.join(
             env.localroot, "results", "%s%d%s" % (config_name, i, outdir_suffix)), i)
@@ -316,8 +336,8 @@ def full_pmf_multi(start_iter, num_iters, config_name, outdir_suffix, atom_type1
 
     pressure_changed = 0
 
-    for i in xrange(si, si+ni):
-        full_pmf("%s%d" % (config_name, i+1), i, "%s%d%s" % (config_name, i, outdir_suffix),
+    for i in xrange(si, si + ni):
+        full_pmf("%s%d" % (config_name, i + 1), i, "%s%d%s" % (config_name, i, outdir_suffix),
                  config_name, atom_type1, atom_type2, script, atom_dir, **args)
 
 
@@ -334,13 +354,15 @@ def lammps_get_pressure(log_dir, number):
     print("READ: new_CG.prod%d.log" % (number))
     return np.average(d1), np.std(d1)  # average and stdev
 
+
 def get_FabMD_tmp_path():
     """ Creates a directory within FabMD for file manipulation
     Once simulations are completed, its contents can be removed"""
-    tmp_path = FabMD_path+"/tmp"
+    tmp_path = FabMD_path + "/tmp"
     if not os.path.isdir(tmp_path):
         os.mkdir(tmp_path)
     return tmp_path
+
 
 @task
 def easymd_example(config, **args):
@@ -371,36 +393,36 @@ def easymd_example(config, **args):
     my_campaign = uq.Campaign(name="lammps_example", work_dir=tmp_path)
 
     params = {
-        "velocity_seed"  : {
+        "velocity_seed": {
             "type": "integer",
             "min": "1",
             "max": "1e6",
-            "default":"1"}
+            "default": "1"}
     }
 
     input_file_target = 'in.lammps'
     encoder = uq.encoders.GenericEncoder(
-            template_fname=config_dir + '/lammps.template',
-            delimiter='@',
-            target_filename=input_file_target)
+        template_fname=config_dir + '/lammps.template',
+        delimiter='@',
+        target_filename=input_file_target)
 
     decoder = uq.decoders.SimpleCSV(
-            target_filename='output.csv',
-            output_columns=['solvation_energy'],
-            header=0)
+        target_filename='output.csv',
+        output_columns=['solvation_energy'],
+        header=0)
 
     collater = uq.collate.AggregateSamples(average=False)
 
     my_campaign.add_app(name="lammps_example",
-            params=params,
-            encoder=encoder,
-            decoder=decoder,
-            collater=collater)
+                        params=params,
+                        encoder=encoder,
+                        decoder=decoder,
+                        collater=collater)
 
     # Set parameters to vary: velocity seed will be a random integer
     random_seed = uq.sampling.RandomSampler(
-            vary={"velocity_seed": cp.DiscreteUniform(0, 100000000)},
-            max_num=3
+        vary={"velocity_seed": cp.DiscreteUniform(0, 100000000)},
+        max_num=3
     )
     my_campaign.set_sampler(random_seed)
 
@@ -411,13 +433,14 @@ def easymd_example(config, **args):
     pprint(my_campaign.list_runs())
 
     # Save campaign state for later analysis step
-    my_campaign.save_state(config_dir+'/save_campaign_state.json')
+    my_campaign.save_state(config_dir + '/save_campaign_state.json')
 
     # Convert campaign to FabSim ensemble for execution
     campaign2ensemble(config, campaign_dir=my_campaign.campaign_dir)
 
     # Execute lammps ensemble job
     lammps_ensemble(config, input_name_in_config=input_file_target, **args)
+
 
 @task
 def easymd_example_analyse(config, output_dir, **args):
@@ -437,7 +460,7 @@ def easymd_example_analyse(config, output_dir, **args):
 
     # Reload EasyVVUQ campaign state
     my_campaign = uq.Campaign(
-        state_file=config_dir+"/save_campaign_state.json", work_dir=tmp_path)
+        state_file=config_dir + "/save_campaign_state.json", work_dir=tmp_path)
 
     # Retrive results from execution machine and put them back into a campaign
     fetch_results()
@@ -453,6 +476,6 @@ def easymd_example_analyse(config, output_dir, **args):
     my_campaign.apply_analysis(stats)
     print("stats:", my_campaign.get_last_analysis())
 
-
+'''
 from plugins.FabMD.gromacs_ensembles import *
 from plugins.FabMD.lammps_restart import *
