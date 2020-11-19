@@ -3,6 +3,9 @@
 # 
 # Here, you can find some examples for pre-defined remote machines
 # All env variable can be modified here and will overwrite setting in machines.yml and machines_user.yml
+
+required_py_packages: &PY_PKG ["easyvvuq"] 
+
 default:
   lammps_params:
     lammps_input: "in.lammps"
@@ -18,6 +21,12 @@ default:
         checkpoint:
         index: index.ndx
 
+  # possible inputs are: ["delete","ignore","warn_only"]
+  # 1- delete : delte the exist results folder 
+  # 2- ignore : ignore the exist results folder 
+  # 2- warn_only : warn user and keep the exist results folder
+  prevent_results_overwrite: "delete"
+
 
 localhost:
   # location of lmp_serial in your local PC
@@ -25,4 +34,25 @@ localhost:
   gromacs_exec: "/usr/local/gromacs/bin/gmx"
   # used core for executing lmp_serial on your local PC
   cores: 1
+
+eagle_hidalgo:
+  # location of lmp_serial on the remote machine
+  lammps_exec: "/home/users/hamid/lammps/src/lmp_serial"
+  gromacs_exec: "/opt/exp_soft/local/generic/gromacs/2018/mpi/bin/gmx_mpi_openmp"
+
+
+  cores: 1
+  # format days-hours:minutes:seconds
+  job_wall_time : "0-0:10:00"
+  partition_name: "fast"
+
+  fabric_dir: "FabMD_tests"
+
+  py_pkg: *PY_PKG
+
+  modules:
+    # list of modules to be loaded on remote machine
+    loaded: ["python/3.7.3", "openmpi/4.0.0_gcc620", "lammps/15Apr2020", "gromacs/2018_mpi"]
+    # list of modules to be unloaded on remote machine
+    unloaded: ["python"]  
 
