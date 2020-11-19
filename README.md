@@ -1,3 +1,4 @@
+
 # FabMD
 FabMD is a  [FabSim3](https://github.com/djgroen/FabSim3) plugin for automated [LAMMPS](https://lammps.sandia.gov/)-based simulations.
 
@@ -10,9 +11,11 @@ This plugin provides functionality to extend FabSim3's workflow and remote submi
       * [FabMD Installation](#fabmd-installation)
    * [How to run a LAMMPS Job](#how-to-run-a-lammps-job)
    * [How to run a GROMACS Job](#how-to-run-a-gromacs-job)
-   * [Run Ensemble Examples](#run-ensemble-examples)     
-
+   * [Run Ensemble Examples](#run-ensemble-examples)
+   * [EasyVVUQ + FabMD example](#easyvvuq--fabmd-example)
 ## Installation
+
+
 
 ### LAMMPS Installation
 
@@ -175,3 +178,23 @@ fabsim localhost gromacs_ensemble:gromacs_ensemble_test,grompp=npt.mdp
 ```
 The run files and SWEEP directory are contained with in `config_files/gromacs_ensemble_test`. The grompp file must be specified on the command line because there are a few options in the directory, if this does not make sense please read the  [How to run a GROMACS Job](#how-to-run-a-gromacs-job) section.
 
+
+# EasyVVUQ + FabMD example
+This example shows how to create an ensemble of LAMMPS simulations using [EasyVVUQ](https://github.com/UCL-CCS/EasyVVUQ), execute the jobs through FabMD, then analyse them within the EasyVVUQ architecture. All within 3 FabSim commands!!!
+* _NOTE_ all the easyvvuq campaign infantilization, runs execution, and the results analyse will be done on target machine which can be your localhost or remote HPC machine.
+
+Its a very simple example of a LAMMPS ensemble. 3 runs are created and given different velocity seeds. The solvation energy is calculated at the end of each simulation and the average and standard deviation are output to screen. The intention for this example is to provide a guide to designing your own workflow that uses these two tools together.
+
+The input files needed for this example are found in `plugins/FabMD/config_files/fabmd_easyvvuq_test1`. This directory contains three files:
+
+-   `lammps.template`: is the LAMMPS input script in `sampler_inputs` subfolder, EasyVVUQ will substitute certain variables in this file to create the ensemble.
+-   `data.peptide`: is the configuration file for a peptide in water for LAMMPS simulation. This remains common to all simulations.
+-   `campaign_params.yml`: is the configuration file, in `sampler_inputs` subfolder, for EasyVVUQ sampler. If you need different sampler, parameter to be varied, or polynomial order, you can set them in this file.
+### Execution
+These are the commands you needed to run this example:
+```
+fabsim <remote machine> lammps_init_campaign:fabmd_easyvvuq_test1
+fabsim <remote machine> lammps_run_campaign:fabmd_easyvvuq_test1
+fabsim <remote machine> lammps_analyse_campaign:fabmd_easyvvuq_test1
+```
+`<remote machine>` can be your `localhost` or a HPC resources.

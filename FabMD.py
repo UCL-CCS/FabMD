@@ -5,6 +5,9 @@
 # Please refer to LICENSE for detailed information regarding the licensing.
 #
 # This file contains FabSim definitions specific to FabNanoMD.
+# authors:
+#           Hamid Arabnejad, Robbie Sinclair, Derek Groen, Maxime Vassaux,
+#           and Werner Müller
 
 from base.fab import *
 from pprint import pprint
@@ -154,6 +157,101 @@ def make_grompp_command(config, **args):
         grompp_command += '-' + arg + ' ' + grompp_args[arg] + ' '
     print('grompp arguments = ', grompp_command)
     return grompp_command
+
+
+@task
+@load_plugin_env_vars("FabMD")
+def lammps_init_campaign(config, **args):
+    """
+    fab localhost lammps_init_campaign:fabmd_easyvvuq_test1
+    fab eagle_hidalgo lammps_init_campaign:fabmd_easyvvuq_test1
+    """
+    update_environment(args)
+    with_config(config)
+    # to prevent mixing with previous campaign runs
+    env.prevent_results_overwrite = "delete"
+    execute(put_configs, config)
+
+    # adds a label to the generated job folder
+    job_lable = 'init_campaign'
+    # job_name_template: ${config}_${machine_name}_${cores}
+    env.job_name_template += '_{}'.format(job_lable)
+
+    env.script = 'lammps_init_campaign'
+    job(args)
+
+
+@task
+@load_plugin_env_vars("FabMD")
+def lammps_run_campaign(config, **args):
+    """
+    fab localhost lammps_run_campaign:fabmd_easyvvuq_test1
+    fab eagle_hidalgo lammps_run_campaign:fabmd_easyvvuq_test1
+    """
+    print("Start lammps_run_campaign\n")
+
+    update_environment(args)
+    with_config(config)
+    path_to_config = find_config_file_path(config)
+    print("local config file path at: %s" % path_to_config)
+
+    path_to_config_on_remote_host = env.job_config_path
+    print("remote config file path at: %s" % path_to_config_on_remote_host)
+
+    sweep_dir = path_to_config_on_remote_host + "/SWEEP"
+    env.script = 'lammps'
+
+    # adds a label to the generated job folder
+    job_lable = 'run_campaign'
+    # job_name_template: ${config}_${machine_name}_${cores}
+    env.job_name_template += '_{}'.format(job_lable)
+
+    env.update(env.lammps_params)
+    run_ensemble(config, sweep_dir, sweep_on_remote=True,
+                 execute_put_configs=False, **args)
+
+    print("\nfinish lammps_run_campaign ...\n")
+
+
+@task
+@load_plugin_env_vars("FabMD")
+def lammps_analyse_campaign(config, **args):
+    """
+    fab localhost lammps_analyse_campaign:fabmd_easyvvuq_test1
+    fab eagle_hidalgo lammps_analyse_campaign:fabmd_easyvvuq_test1
+    """
+    update_environment(args)
+    with_config(config)
+
+    job_lable = 'run_campaign'
+    env.src_campaign_dir = os.path.join(env.results_path, template(
+        env.job_name_template) + '_{}'.format(job_lable))
+
+    job_lable = 'init_campaign'
+    env.dst_campaign_dir = os.path.join(env.results_path, template(
+        env.job_name_template) + '_{}'.format(job_lable))
+
+    # adds a label to the generated job folder
+    job_lable = 'analyse_campaign'
+    # job_name_template: ${config}_${machine_name}_${cores}
+    env.job_name_template += '_{}'.format(job_lable)
+
+    #env.TestOnly = 'True'
+    env.script = 'lammps_analyse_campaign'
+    job(args)
+
+    # print(template(env.job_name_template))
+    # pprint(env)
+
+
+def get_FabMD_tmp_path():
+    """ Creates a directory within FabMD for file manipulation
+    Once simulations are completed, its contents can be removed"""
+    tmp_path = FabMD_path + "/tmp"
+    if not os.path.isdir(tmp_path):
+        os.mkdir(tmp_path)
+    return tmp_path
+
 
 '''
 
@@ -355,13 +453,7 @@ def lammps_get_pressure(log_dir, number):
     return np.average(d1), np.std(d1)  # average and stdev
 
 
-def get_FabMD_tmp_path():
-    """ Creates a directory within FabMD for file manipulation
-    Once simulations are completed, its contents can be removed"""
-    tmp_path = FabMD_path + "/tmp"
-    if not os.path.isdir(tmp_path):
-        os.mkdir(tmp_path)
-    return tmp_path
+
 
 
 @task

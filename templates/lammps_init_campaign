@@ -1,0 +1,17 @@
+
+cd $job_results
+$run_prefix
+
+/usr/bin/env > env.log
+
+# executing easyvvuq sampler
+python3 MD_easyvvuq_init.py
+
+
+# sync generated easyvvuq folder to config directory
+easyvvuq_SWEEP_dir=$$(find MD_easyvvuq_* -maxdepth 3 -name "SWEEP*" -type d)
+rsync -pthrvz --delete $$easyvvuq_SWEEP_dir $job_config_path
+
+echo "Done ..."
+echo "easyvvuq SWEEP folder is copied from $$PWD/$$easyvvuq_SWEEP_dir ->  $job_config_path"
+
