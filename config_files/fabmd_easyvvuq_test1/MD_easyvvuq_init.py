@@ -62,6 +62,9 @@ def init_campaign():
         output_columns=campaign_params['decoder_output_columns']
     )
 
+    # Create a collation element for this campaign
+    collater = uq.collate.AggregateSamples(average=False)
+
     # Add the covid19-SCSampler app
     campaign.add_app(name=campaign_params['campaign_name'],
                      params=campaign_params['params'],
