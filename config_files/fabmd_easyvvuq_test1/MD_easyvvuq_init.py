@@ -59,19 +59,14 @@ def init_campaign():
 
     decoder = uq.decoders.SimpleCSV(
         target_filename=campaign_params['decoder_target_filename'],
-        output_columns=campaign_params['decoder_output_columns'],
-        header=0
+        output_columns=campaign_params['decoder_output_columns']
     )
-
-    # Create a collation element for this campaign
-    collater = uq.collate.AggregateSamples(average=False)
 
     # Add the covid19-SCSampler app
     campaign.add_app(name=campaign_params['campaign_name'],
                      params=campaign_params['params'],
                      encoder=encoder,
-                     decoder=decoder,
-                     collater=collater)
+                     decoder=decoder)
 
     # parameters to vary
     vary = {}
