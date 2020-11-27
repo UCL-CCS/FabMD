@@ -12,6 +12,11 @@ default:
     #wall_time: "0:10:00"    
     sweep_dir_name: "SWEEP"    
 
+  namd_params:
+    namd_input: "eq0.conf"
+    #wall_time: "0:10:00"    
+    sweep_dir_name: "SWEEP"
+
   gromacs_params:
     sweep_dir_name: "SWEEP"
     required_files:

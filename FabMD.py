@@ -28,6 +28,14 @@ def lammps(config, **args):
     env.update(env.lammps_params)
     return md_job(config, 'lammps', **args)
 
+@task
+@load_plugin_env_vars("FabMD")
+def namd(config, **args):
+    """
+    fab localhost namd:namd_test1
+    """
+    env.update(env.namd_params)
+    return md_job(config, 'namd', **args)
 
 @task
 @load_plugin_env_vars("FabMD")

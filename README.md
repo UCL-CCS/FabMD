@@ -49,6 +49,20 @@ We suggest to install it from source files.
 	...
 	```
 
+### NAMD Installation
+
+We suggest to follow installation instructions from the [NAMD website](https://www.ks.uiuc.edu/Research/namd/2.9/ug/node94.html). 
+
+- Modify ``machines_FabMD_user.yml`` to make the *`namd_exec`* variable point to the location of the NAMD executable. e.g.
+        ```yaml
+        ...
+        localhost:
+                 namd_exec: "/home/hamid/opt/path/to/namd/sources/namd2"
+                 ...
+        ...
+        ```
+
+
 ### GROMACS Installation
 We suggest to use automate installer ([source](https://bioinformaticsreview.com/20151126/how-to-install-gromacs-5-x-x-on-linux-ubuntu-14-04-lts/) ).
 
@@ -92,6 +106,30 @@ default:
     sweep_dir_name: "SWEEP"    
 ...
 ```
+## How to run a NAMD Job
+For this example we assume NAMD has been installed on the desired host machine and the location (`namd_exec`) has been specified in the file `machines_FabMD_user.yml`.
+
+All the input files required for a NAMD simulation should be contained in a directory in `config_files`.
+
+A minimal example NAMD simulation is provided in `config_files/namd_test1`, to execute this example type:
+
+```sh
+fabsim localhost namd:namd_test1
+```
+Modifications can be added in the command line like:
+```sh
+fabsim host namd:namd_test1,namd_input:eq0.conf
+```
+or by specifying default values for these arguments in: `machines_FabMD_user.yml`.
+
+```yaml
+default:
+  namd_params:
+    namd_input: "eq0.conf"
+    sweep_dir_name: "SWEEP"
+...
+```
+
 ## How to run a GROMACS Job
 For this example we assume GROMACS has been installed on the desired host machine and the location (`gromacs_exec`) has been specified in the file `machines_FabMD_user.yml`.
 
