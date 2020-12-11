@@ -1,0 +1,107 @@
+{
+  "box_size": {
+    "default": 14.0,
+    "type": "float"
+  },
+  "cutoff": {
+    "default": 12.0,
+    "type": "float"
+  },
+  "switching": {
+    "default": "on",
+    "type": "string"
+  },
+  "timestep": {
+    "default": 2.0,
+    "type": "float"
+  },
+  "rigidBonds": {
+    "default": "all",
+    "type": "string"
+  },
+  "rigidtolerance": {
+    "default": 0.00001,
+    "type": "float"
+  },
+  "rigidIterations": {
+    "default": 100,
+    "type": "integer"
+  },
+  "nonbondedFreq": {
+    "default": 1,
+    "type": "integer"
+  },
+  "fullElectFrequency": {
+    "default": 2,
+    "type": "integer"
+  },
+  "stepspercycle": {
+    "default": 10,
+    "type": "integer"
+  },
+  "PMEGridSpacing": {
+    "default": 1.0,
+    "type": "float"
+  },
+  "minimize_eq0": {
+    "default": 1000,
+    "type": "integer"
+  },
+  "rng_seed_eq1": {
+    "default": 12345,
+    "type": "integer"
+  },
+  "initTemperature_eq1": {
+    "default": 50.0,
+    "type": "float"
+  },
+  "reassignFreq_eq1": {
+    "default": 100,
+    "type": "integer"
+  },
+  "reassignIncr_eq1": {
+    "default": 1.0,
+    "type": "float"
+  },
+  "langevinDamping": {
+    "default": 5.0,
+    "type": "float"
+  },
+  "langevinHydrogen": {
+    "default": "no",
+    "type": "string"
+  },
+  "useGroupPressure": {
+    "default": "yes",
+    "type": "string"
+  },
+  "BerendsenPressureCompressibility": {
+    "default": 0.0000457,
+    "type": "float"
+  },
+  "BerendsenPressureRelaxationTime": {
+    "default": 100.0,
+    "type": "float"
+  },
+  "BerendsenPressureFreq": {
+    "default": 2,
+    "type": "integer"
+  },
+  "setTemperature": {
+    "default": 300.0,
+    "type": "float"
+  },
+  "time_factor_eq": {
+    "default": 60000.0,
+    "type": "float"
+  },
+  "BerendsenPressureTarget": {
+    "default": 1.01325,
+    "type": "float"
+  },
+  "time_sim1": {
+    "default": 10000000.0,
+    "type": "float"
+  }
+}
+
