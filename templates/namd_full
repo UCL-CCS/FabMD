@@ -7,33 +7,35 @@ $run_prefix
 n_drugs=1
 drug=$app_name
 n_replicas=$n_replicas
+path_template_drug="$$PWD"
 
 # Model Builder
-cd $$drug/build
-path_template_drug=$${path_template}/$$drug
+cd build
 path_data_drug=$${path_template_drug}/par
 sed -i -e "s;__path_to_drug_par__;$$path_data_drug;g" tleap.in 
 tleap -s -f tleap.in > tleap.log
 bash $${path_template_drug}/build/compute_dimensions.sh $${path_template_drug}
 awk -f $${path_template_drug}/build/constraint.awk complex.pdb $${path_template_drug}/constraint/prot.pdb > ../constraint/cons.pdb
+
 cd ../fe/build
 ante-MMPBSA.py -p ../../build/complex.prmtop -c com.top -r rec.top -l lig.top -s :129-100000 -n :128
-cd ../../../
 
+cd ../../../
 
 # Equilibration simulation
 for step in {0..2}; do
-    if [ -s $${drug}/build/complex.prmtop ]; then
-       namd2 +replicas $${n_replicas} $${drug}/replica-confs/eq$$step-replicas.conf &
+    if [ -s build/complex.prmtop ]; then
+       namd2 +replicas $${n_replicas} replica-confs/eq$$step-replicas.conf &
        sleep 5
     fi
     wait
 done
 
+
 # simulation
 for step in {1..1}; do
-    if [ -s $${drug}/build/complex.prmtop ]; then
-       namd2 +replicas $${n_replicas} $${drug}/replica-confs/sim$$step-replicas.conf &
+    if [ -s build/complex.prmtop ]; then
+       namd2 +replicas $${n_replicas} /replica-confs/sim$$step-replicas.conf &
        sleep 5
     fi
     wait
@@ -41,8 +43,8 @@ done
 
 # MMPB(GB)SA
 for i in $$(seq 1 $$n_replicas); do
-    cd $$drug/fe/mmpbsa/rep$$i
-    MMPBSA.py.MPI -i $${path_template}/mmpbsa.in -sp ../../../build/complex.prmtop -cp ../../build/com.top -rp ../../build/rec.top -lp ../../build/lig.top -y ../../../replicas/rep$$i/simulation/sim1.dcd &
+    cd $${path_template_drug}/fe/mmpbsa/rep$$i
+    MMPBSA.py.MPI -i $${path_template_drug}/mmpbsa.in -sp ../../../build/complex.prmtop -cp ../../build/com.top -rp ../../build/rec.top -lp ../../build/lig.top -y ../../../replicas/rep$$i/simulation/sim1.dcd &
 sleep 3
     cd ../../../../
 done
@@ -50,7 +52,7 @@ done
 wait
 
 for i in $$(seq 1 $$n_replicas); do
-    cd $$drug/fe/mmpbsa/rep$$i
+    cd $${path_template_drug}/fe/mmpbsa/rep$$i
     xargs -d '\n' -I cmd -P 9 /bin/bash -c 'cmd'  <<EOF &
 cat _MMPBSA_complex_gb.mdout.{0..47} > _MMPBSA_complex_gb.mdout.all
 cat _MMPBSA_complex_gb_surf.dat.{0..47} > _MMPBSA_complex_gb_surf.dat.all
@@ -70,7 +72,7 @@ done
 wait
 
 for i in $$(seq 1 $$n_replicas); do
-    cd $$drug/fe/mmpbsa/rep$$i
+    cd $${path_template_drug}/fe/mmpbsa/rep$$i
     rm _MMPBSA_*.{0..47} reference.frc *.pdb *.inpcrd *.mdin* *.out
     cd ../../../../
 done
@@ -78,7 +80,7 @@ done
 echo "drug,binding_energy_avg" > output.csv
 rm tmp.output.csv
 for i in $$(seq 1 $$n_replicas); do
-    cd $$drug/fe/mmpbsa/rep$$i
+    cd $${path_template_drug}/fe/mmpbsa/rep$$i
     tmp_str=$$(awk '{if(index($$0, "DELTA TOTAL")> 0) {count++}; if(count>1) { print $$3; count=0}} ' ./FINAL_RESULTS_MMPBSA.dat)
     cd ../../../../
     #echo "$$drug,$$i,$$tmp_str" >> nonavg.output.csv

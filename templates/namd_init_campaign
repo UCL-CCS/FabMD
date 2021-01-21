@@ -9,12 +9,13 @@ python3 BAC_easyvvuq_init.py
 
 
 # create SWEEP folder
-mkdir -p $job_config_path/SWEEP
+mkdir -p $job_config_path/campaign_config/templates/$app_name/SWEEP
+
 
 
 # sync generated easyvvuq folder to config directory
 easyvvuq_RUNS_dir=$$(find BAC_easyvvuq_* -maxdepth 3 -name "runs*" -type d)
-rsync -pthrvz --delete $$easyvvuq_RUNS_dir/* $job_config_path/SWEEP
+rsync -pthrvz --delete $$easyvvuq_RUNS_dir/* $job_config_path/campaign_config/templates/$app_name/SWEEP
 
 
 echo "Done ..."

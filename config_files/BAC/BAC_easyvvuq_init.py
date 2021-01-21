@@ -53,35 +53,32 @@ def init_campaign():
     #################################
     n_replicas = campaign_config['n_replicas']
     directory_tree = {
-        campaign_config['app_name']: {
+        'build': None,
+        'constraint': None,
+        'fe': {
             'build': None,
-            'constraint': None,
-            'fe': {
-                'build': None,
-                'dcd': None,
-                'mmpbsa': {
-                    'rep' + str(i): None for i in range(1, n_replicas + 1)
-                },
+            'dcd': None,
+            'mmpbsa': {
+                'rep' + str(i): None for i in range(1, n_replicas + 1)
             },
-            'par': None,
-            'replica-confs': None,
-            'replicas': {
-                'rep' + str(i): {
-                    'equilibration': None,
-                    'simulation': None
-                }
-                for i in range(1, n_replicas + 1)
-            },
+        },
+        'par': None,
+        'replica-confs': None,
+        'replicas': {
+            'rep' + str(i): {
+                'equilibration': None,
+                'simulation': None
+            }
+            for i in range(1, n_replicas + 1)
         }
     }
+
     src_confs = os.path.join(campaign_config_dir,
                              'templates',
                              campaign_config['app_name'],
                              'replica-confs'
                              )
-    dst_confs = os.path.join(campaign_config['app_name'],
-                             'replica-confs'
-                             )
+    dst_confs = os.path.join('replica-confs')
 
     multiencoder = uq.encoders.MultiEncoder(
         uq.encoders.DirectoryBuilder(tree=directory_tree),
@@ -114,9 +111,7 @@ def init_campaign():
             template_fname=os.path.join(
                 campaign_config_dir, 'templates', campaign_config['app_name'],
                 'build', 'tleap.in'),
-            target_filename=os.path.join(
-                campaign_config['app_name'],
-                'build', 'tleap.in'))
+            target_filename=os.path.join('build', 'tleap.in'))
     )
 
     decoder = uq.decoders.SimpleCSV(

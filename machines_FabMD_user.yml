@@ -57,7 +57,7 @@ eagle_hidalgo:
 
   modules:
     # list of modules to be loaded on remote machine
-    loaded: ["python/3.7.3", "openmpi/4.0.0_gcc620", "lammps/15Apr2020", "gromacs/2018_mpi"]
+    loaded: ["python/3.7.3", "openmpi/4.0.0_gcc620", "lammps/15Apr2020", "gromacs/2018_mpi", "amber/14", "amber/14"]
     # list of modules to be unloaded on remote machine
     unloaded: ["python"]  
 
