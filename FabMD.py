@@ -273,6 +273,15 @@ def namd_init_campaign(config, **args):
     # job_name_template: ${config}_${machine_name}_${cores}
     env.job_name_template += '_{}'.format(job_lable)
 
+    # read config param from yaml file
+    path_to_config = find_config_file_path(config)
+    campaign_config = yaml.load(open(os.path.join(path_to_config,
+                                                  'campaign_config',
+                                                  'campaign_config.yml')),
+                                Loader=yaml.SafeLoader
+                                )
+    env.app_name = campaign_config['app_name']
+
     env.script = 'namd_init_campaign'
     job(args)
 
