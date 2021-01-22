@@ -5,7 +5,7 @@ $run_prefix
 
 
 n_drugs=1
-drug=$app_name
+# drug=$app_name
 n_replicas=$n_replicas
 path_template_drug="$$PWD"
 
@@ -20,7 +20,7 @@ awk -f $${path_template_drug}/build/constraint.awk complex.pdb $${path_template_
 cd ../fe/build
 ante-MMPBSA.py -p ../../build/complex.prmtop -c com.top -r rec.top -l lig.top -s :129-100000 -n :128
 
-cd ../../../
+cd ../../
 
 # Equilibration simulation
 for step in {0..2}; do
