@@ -3,7 +3,7 @@
 
 
 polynomial_order: 1
-n_replicas: 3
+n_replicas: 1
 
 campaign_name: "BAC"
 

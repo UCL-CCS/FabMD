@@ -61,3 +61,19 @@ eagle_hidalgo:
     # list of modules to be unloaded on remote machine
     unloaded: ["python"]  
 
+eagle_vecma:
+  # location of lmp_serial on the remote machine
+  lammps_exec: "/home/plgrid/plgvassaux/source/lammps-17Nov16/src/lmp_mpi"
+  namd_exec: "/opt/exp_soft/local/generic/namd/NAMD_2.12_Linux-x86_64-verbs-smp/namd2"
+  gromacs_exec: "/opt/exp_soft/local/generic/gromacs/2018/mpi/bin/gmx_mpi_openmp"
+  cores: 28
+  # format days-hours:minutes:seconds
+  job_wall_time : "0-0:10:00"
+  partition_name: "fast"
+
+  modules:
+    # list of modules to be loaded on remote machine
+    loaded: ["openmpi/4.0.0_gcc620", "lammps/15Apr2020", "gromacs/2018_mpi", "namd", "amber"]
+    # list of modules to be unloaded on remote machine
+    unloaded: ["python"]
+

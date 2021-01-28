@@ -116,8 +116,10 @@ def init_campaign():
 
     decoder = uq.decoders.SimpleCSV(
         target_filename=campaign_config['decoder_target_filename'],
-        output_columns=campaign_config['decoder_output_columns']
+        output_columns=campaign_config['decoder_output_columns'], header=0, delimiter=','
     )
+
+    collater = uq.collate.AggregateSamples(average=False)
 
     ###################
     # Add the BAC app #
@@ -125,6 +127,7 @@ def init_campaign():
     campaign.add_app(name=campaign_name,
                      params=campaign_config['params'],
                      encoder=multiencoder,
+                     collater=collater,
                      decoder=decoder)
     # campaign.set_app(campaign_name)
 

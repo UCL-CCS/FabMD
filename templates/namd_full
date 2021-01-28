@@ -25,7 +25,7 @@ cd ../../
 # Equilibration simulation
 for step in {0..2}; do
     if [ -s build/complex.prmtop ]; then
-       namd2 +replicas $${n_replicas} replica-confs/eq$$step-replicas.conf &
+       $run_command namd2 +replicas $${n_replicas} replica-confs/eq$$step-replicas.conf &
        sleep 5
     fi
     wait
@@ -35,7 +35,7 @@ done
 # simulation
 for step in {1..1}; do
     if [ -s build/complex.prmtop ]; then
-       namd2 +replicas $${n_replicas} /replica-confs/sim$$step-replicas.conf &
+       $run_command namd2 +replicas $${n_replicas} /replica-confs/sim$$step-replicas.conf &
        sleep 5
     fi
     wait
@@ -44,7 +44,7 @@ done
 # MMPB(GB)SA
 for i in $$(seq 1 $$n_replicas); do
     cd $${path_template_drug}/fe/mmpbsa/rep$$i
-    MMPBSA.py.MPI -i $${path_template_drug}/mmpbsa.in -sp ../../../build/complex.prmtop -cp ../../build/com.top -rp ../../build/rec.top -lp ../../build/lig.top -y ../../../replicas/rep$$i/simulation/sim1.dcd &
+    mpirun -np $corespernode MMPBSA.py.MPI -i $${path_template_drug}/mmpbsa.in -sp ../../../build/complex.prmtop -cp ../../build/com.top -rp ../../build/rec.top -lp ../../build/lig.top -y ../../../replicas/rep$$i/simulation/sim1.dcd &
 sleep 3
     cd ../../../../
 done
