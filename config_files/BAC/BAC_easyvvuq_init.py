@@ -85,26 +85,26 @@ def init_campaign():
         Eq0Encoder(
             template_fname=os.path.join(src_confs, 'template_eq0.conf'),
             target_filename=os.path.join(dst_confs, 'eq0.conf')),
-        uq.encoders.CopyEncoder(
-            source_filename=os.path.join(src_confs, 'eq0-replicas.conf'),
+        Eq0Encoder(
+            template_fname=os.path.join(src_confs, 'eq0-replicas.conf'),
             target_filename=os.path.join(dst_confs, 'eq0-replicas.conf')),
         Eq1Encoder(
             template_fname=os.path.join(src_confs, 'template_eq1.conf'),
             target_filename=os.path.join(dst_confs, 'eq1.conf')),
-        uq.encoders.CopyEncoder(
-            source_filename=os.path.join(src_confs, 'eq1-replicas.conf'),
+        Eq1Encoder(
+            template_fname=os.path.join(src_confs, 'eq1-replicas.conf'),
             target_filename=os.path.join(dst_confs, 'eq1-replicas.conf')),
         Eq2Encoder(
             template_fname=os.path.join(src_confs, 'template_eq2.conf'),
             target_filename=os.path.join(dst_confs, 'eq2.conf')),
-        uq.encoders.CopyEncoder(
-            source_filename=os.path.join(src_confs, 'eq2-replicas.conf'),
+        Eq2Encoder(
+            template_fname=os.path.join(src_confs, 'eq2-replicas.conf'),
             target_filename=os.path.join(dst_confs, 'eq2-replicas.conf')),
         SimEncoder(
             template_fname=os.path.join(src_confs, 'template_sim1.conf'),
             target_filename=os.path.join(dst_confs, 'sim1.conf')),
-        uq.encoders.CopyEncoder(
-            source_filename=os.path.join(src_confs, 'sim1-replicas.conf'),
+        SimEncoder(
+            template_fname=os.path.join(src_confs, 'sim1-replicas.conf'),
             target_filename=os.path.join(dst_confs, 'sim1-replicas.conf')),
         uq.encoders.GenericEncoder(
             delimiter=campaign_config['encoder_delimiter'],
@@ -121,6 +121,7 @@ def init_campaign():
 
     collater = uq.collate.AggregateSamples(average=False)
 
+    campaign_config['params']['n_replicas']['default'] = n_replicas
     ###################
     # Add the BAC app #
     ###################

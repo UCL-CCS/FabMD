@@ -102,6 +102,10 @@
   "time_sim1": {
     "default": 10000000.0,
     "type": "float"
-  }
+  },
+  "n_replicas": {
+    "default": -1,
+    "type": "integer"
+  } 
 }
 
