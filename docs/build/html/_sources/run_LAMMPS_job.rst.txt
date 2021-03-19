@@ -1,3 +1,0 @@
-.. _run_LAMMPS_job:
-
-This document briefly details how user/developers can set up a remote machine on FabSim3 for job submission.
