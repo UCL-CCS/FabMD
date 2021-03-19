@@ -23,15 +23,4 @@ This plugin provides functionality to extend FabSim3’s workflow and remote sub
 
    execution
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
 
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
