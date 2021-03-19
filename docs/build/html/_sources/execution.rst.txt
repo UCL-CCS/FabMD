@@ -166,7 +166,7 @@ To run type:
 		fabsim localhost lammps_ensemble:lammps_ensemble_example2,lammps_input=in.peptide
 
 
-Gromacs_ensemble_test
+Gromacs ensemble test
 =====================
 
 Hopefully the structure of the ensemble execusion is becoming familar. To run the minimal gromacs ensemble examples type:
