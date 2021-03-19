@@ -1,0 +1,79 @@
+# This is the user personal configuration for job submission and execution for FabCovid19 plugin
+# All given variable here will be override machine settings loaded from (a) FabSim3/deploy/machines.yml and (b) FabSim3/deploy/machines_user.yml 
+# 
+# Here, you can find some examples for pre-defined remote machines
+# All env variable can be modified here and will overwrite setting in machines.yml and machines_user.yml
+
+required_py_packages: &PY_PKG ["easyvvuq"] 
+
+default:
+  lammps_params:
+    lammps_input: "in.lammps"
+    #wall_time: "0:10:00"    
+    sweep_dir_name: "SWEEP"    
+
+  namd_params:
+    namd_input: "eq0.conf"
+    #wall_time: "0:10:00"    
+    sweep_dir_name: "SWEEP"
+
+  gromacs_params:
+    sweep_dir_name: "SWEEP"
+    required_files:
+        grompp: nvt.mdp
+        conf: npt4b.gro
+        topol: top.top
+        checkpoint:
+        index: index.ndx
+
+  # possible inputs are: ["delete","ignore","warn_only"]
+  # 1- delete : delte the exist results folder 
+  # 2- ignore : ignore the exist results folder 
+  # 2- warn_only : warn user and keep the exist results folder
+  prevent_results_overwrite: "delete"
+
+
+localhost:
+  # location of lmp_serial in your local PC
+  lammps_exec: "/home/hamid/lammps/src/lmp_serial"
+  gromacs_exec: "/usr/local/gromacs/bin/gmx"
+  # used core for executing lmp_serial on your local PC
+  cores: 1
+
+eagle_hidalgo:
+  # location of lmp_serial on the remote machine
+  lammps_exec: "/home/users/hamid/lammps/src/lmp_serial"
+  gromacs_exec: "/opt/exp_soft/local/generic/gromacs/2018/mpi/bin/gmx_mpi_openmp"
+
+
+  cores: 1
+  # format days-hours:minutes:seconds
+  job_wall_time : "0-0:10:00"
+  partition_name: "fast"
+
+  fabric_dir: "FabMD_tests"
+
+  py_pkg: *PY_PKG
+
+  modules:
+    # list of modules to be loaded on remote machine
+    loaded: ["python/3.7.3", "openmpi/4.0.0_gcc620", "namd/2.12-verbs-smp", "lammps/15Apr2020", "gromacs/2018_mpi", "amber/16"]
+    # list of modules to be unloaded on remote machine
+    unloaded: ["python"]  
+
+eagle_vecma:
+  # location of lmp_serial on the remote machine
+  lammps_exec: "/home/plgrid/plgvassaux/source/lammps-17Nov16/src/lmp_mpi"
+  namd_exec: "/opt/exp_soft/local/generic/namd/NAMD_2.12_Linux-x86_64-verbs-smp/namd2"
+  gromacs_exec: "/opt/exp_soft/local/generic/gromacs/2018/mpi/bin/gmx_mpi_openmp"
+  cores: 28
+  # format days-hours:minutes:seconds
+  job_wall_time : "0-0:10:00"
+  partition_name: "fast"
+
+  modules:
+    # list of modules to be loaded on remote machine
+    loaded: ["openmpi/4.0.0_gcc620", "lammps/15Apr2020", "gromacs/2018_mpi", "namd", "amber"]
+    # list of modules to be unloaded on remote machine
+    unloaded: ["python"]
+

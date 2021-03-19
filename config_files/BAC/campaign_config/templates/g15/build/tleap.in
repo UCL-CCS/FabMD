@@ -1,0 +1,14 @@
+source leaprc.protein.ff14SB
+source leaprc.water.tip3p
+source leaprc.gaff
+frcmod = loadamberparams __path_to_drug_par__/g15.frcmod
+loadamberprep __path_to_drug_par__/g15.prep
+
+complex = loadpdb __path_to_drug_par__/g15.pdb
+alignaxes complex
+addions complex Cl- 0.0
+addions complex Na+ 0.0
+solvatebox complex TIP3PBOX $box_size
+savepdb complex complex.pdb
+saveamberparm complex complex.prmtop complex.crd
+quit

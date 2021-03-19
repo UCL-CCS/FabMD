@@ -2,4 +2,10 @@ cd $job_results
 $run_prefix
 
 /usr/bin/env > env.log
-$run_command $lammps_exec $lammps_args < $lammps_input > log.lammps
+
+echo "Start $lammps_exec program..."
+
+$lammps_exec $lammps_args < $lammps_input > log.lammps
+
+echo "Done ..."
+

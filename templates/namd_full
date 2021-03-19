@@ -1,0 +1,92 @@
+cd $job_results
+$run_prefix
+
+/usr/bin/env > env.log
+
+
+n_drugs=1
+# drug=$app_name
+n_replicas=$n_replicas
+path_template_drug="$$PWD"
+
+# Model Builder
+cd build
+path_data_drug=$${path_template_drug}/par
+sed -i -e "s;__path_to_drug_par__;$$path_data_drug;g" tleap.in 
+tleap -s -f tleap.in > tleap.log
+bash $${path_template_drug}/build/compute_dimensions.sh $${path_template_drug}
+awk -f $${path_template_drug}/build/constraint.awk complex.pdb $${path_template_drug}/constraint/prot.pdb > ../constraint/cons.pdb
+
+cd ../fe/build
+ante-MMPBSA.py -p ../../build/complex.prmtop -c com.top -r rec.top -l lig.top -s :129-100000 -n :128
+
+cd ../../
+
+# Equilibration simulation
+for step in {0..2}; do
+    if [ -s build/complex.prmtop ]; then
+       $run_command namd2 +replicas $${n_replicas} replica-confs/eq$$step-replicas.conf &
+       sleep 5
+    fi
+    wait
+done
+
+
+# simulation
+for step in {1..1}; do
+    if [ -s build/complex.prmtop ]; then
+       $run_command namd2 +replicas $${n_replicas} /replica-confs/sim$$step-replicas.conf &
+       sleep 5
+    fi
+    wait
+done
+
+# MMPB(GB)SA
+for i in $$(seq 1 $$n_replicas); do
+    cd $${path_template_drug}/fe/mmpbsa/rep$$i
+    mpirun -np $corespernode MMPBSA.py.MPI -i $${path_template_drug}/mmpbsa.in -sp ../../../build/complex.prmtop -cp ../../build/com.top -rp ../../build/rec.top -lp ../../build/lig.top -y ../../../replicas/rep$$i/simulation/sim1.dcd &
+sleep 3
+    cd ../../../../
+done
+
+wait
+
+for i in $$(seq 1 $$n_replicas); do
+    cd $${path_template_drug}/fe/mmpbsa/rep$$i
+    xargs -d '\n' -I cmd -P 9 /bin/bash -c 'cmd'  <<EOF &
+cat _MMPBSA_complex_gb.mdout.{0..47} > _MMPBSA_complex_gb.mdout.all
+cat _MMPBSA_complex_gb_surf.dat.{0..47} > _MMPBSA_complex_gb_surf.dat.all
+cat _MMPBSA_complex_pb.mdout.{0..47} > _MMPBSA_complex_pb.mdout.all
+cat _MMPBSA_ligand_gb.mdout.{0..47} > _MMPBSA_ligand_gb.mdout.all
+cat _MMPBSA_ligand_gb_surf.dat.{0..47} > _MMPBSA_ligand_gb_surf.dat.all
+cat _MMPBSA_ligand_pb.mdout.{0..47} > _MMPBSA_ligand_pb.mdout.all
+cat _MMPBSA_receptor_gb.mdout.{0..47} > _MMPBSA_receptor_gb.mdout.all
+cat _MMPBSA_receptor_gb_surf.dat.{0..47} > _MMPBSA_receptor_gb_surf.dat.all
+cat _MMPBSA_receptor_pb.mdout.{0..47} > _MMPBSA_receptor_pb.mdout.all
+EOF
+
+        sleep 3
+        cd ../../../../
+    done
+done
+wait
+
+for i in $$(seq 1 $$n_replicas); do
+    cd $${path_template_drug}/fe/mmpbsa/rep$$i
+    rm _MMPBSA_*.{0..47} reference.frc *.pdb *.inpcrd *.mdin* *.out
+    cd ../../../../
+done
+
+echo "drug,binding_energy_avg" > output.csv
+rm tmp.output.csv
+for i in $$(seq 1 $$n_replicas); do
+    cd $${path_template_drug}/fe/mmpbsa/rep$$i
+    tmp_str=$$(awk '{if(index($$0, "DELTA TOTAL")> 0) {count++}; if(count>1) { print $$3; count=0}} ' ./FINAL_RESULTS_MMPBSA.dat)
+    cd ../../../../
+    #echo "$$drug,$$i,$$tmp_str" >> nonavg.output.csv
+    echo "$$tmp_str" >> tmp.output.csv
+done
+tmp_str=$$(awk '{ sum += $$1; n++ } END { if (n > 0) print sum / n; }' tmp.output.csv)
+echo "$$drug,$$tmp_str" >> output.csv
+
+

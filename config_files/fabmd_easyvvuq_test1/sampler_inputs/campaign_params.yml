@@ -1,0 +1,91 @@
+parameters:
+    # <parameter_name:>
+    #   uniform_range: [<lower value>,<upper value>] 
+    velocity_seed:
+        uniform_range: [0, 100000000]
+
+selected_parameters: ["velocity_seed"]
+
+polynomial_order: 2
+
+campaign_name: "FabMD"
+
+encoder_delimiter: "@"
+
+encoder_template_fname : "lammps.template"
+encoder_target_filename: "in.lammps"
+decoder_target_filename: "output.csv"
+
+# keep decoder_output_columns as array, even if you have a single entry
+decoder_output_columns: ["solvation_energy"]
+
+
+# Description of the parameters to associate with the application
+# please follow this structure
+# params:
+#   parameter_name:
+#     type: ...
+#     min: ...
+#     max: ...
+#     default: ...
+params:
+  velocity_seed:
+    type: "integer"
+    min: "1"
+    max: "1e6"
+    default: "1"  
+
+
+
+# sampler_name: str
+#   Samplers in the context of EasyVVUQ are classes that generate
+#   sequences of parameter dictionaries.
+#   available sampler: [SCSampler,PCESampler,RandomSampler]
+#
+#   SCSampler: Stochastic Collocation sampler
+#   PCESampler : Polynomial Chaos Expansion
+#   RandomSampler : 
+#   ---------------------------------------------------------------
+#   TODO : add other available easyvvuq sampler to the code
+#   LHCSampler : Latin hypercube sampling
+#   BasicSweep :
+#   MultiSampler : Expects one or more samplers
+#   ReplicaSampler:
+#   QMCSampler : Quasi Monte Carlo sampler
+#   MCSampler: Monte Carlo sampler
+sampler_name: "SCSampler"
+
+distribution_type: "DiscreteUniform" # Uniform, DiscreteUniform
+
+
+# quadrature_rule : char
+#     The quadrature method, default is Gaussian "G".
+#     "G" -> Gaussian , "C" -> Clenshaw_Curtis
+quadrature_rule: "G"
+
+# sparse : bool
+#             If True use sparse grid instead of normal tensor product grid,
+#             default is False
+sparse: False
+
+# growth: bool
+#     Sets the growth rule to exponential for Clenshaw Curtis quadrature,
+#     which makes it nested, and therefore more efficient for sparse grids.
+#     Default is False.
+growth: False
+
+# midpoint_level1: bool
+#     determines how many points the 1st level of a sparse grid will have.
+#     If midpoint_level1 = True, order 0 quadrature will be generated
+midpoint_level1: False
+
+# dimension_adaptive: bool
+#     determines wether to use an insotropic sparse grid, or to adapt
+#     the levels in the sparse grid based on a hierachical error measure
+dimension_adaptive: False
+
+# ------- NOTE ------------
+# if you set SC_quadrature_rule="C", then you need to make sure
+#     sparse=True
+#     growth=True
+#     midpoint_level1=True
