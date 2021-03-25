@@ -4,6 +4,8 @@ $run_prefix
 
 /usr/bin/env > env.log
 
+start_time="$(date -u +%s.%N)"
+
 # executing easyvvuq sampler
 python3 MD_easyvvuq_init.py
 
@@ -14,4 +16,8 @@ rsync -pthrvz --delete $$easyvvuq_SWEEP_dir $job_config_path
 
 echo "Done ..."
 echo "easyvvuq SWEEP folder is copied from $$PWD/$$easyvvuq_SWEEP_dir ->  $job_config_path"
+
+end_time="$(date -u +%s.%N)"
+elapsed="$(bc <<<"$end_time-$start_time")"
+echo -e "\n\nTotal Executing Time = $elapsed seconds\n" > time.txt
 

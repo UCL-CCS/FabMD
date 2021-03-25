@@ -2,5 +2,12 @@ cd $job_results
 $run_prefix
 
 /usr/bin/env > env.log
+
+start_time="$(date -u +%s.%N)"
+
 $run_command $gromacs_exec grompp $grompp_command
 $run_command $gromacs_exec mdrun 
+
+end_time="$(date -u +%s.%N)"
+elapsed="$(bc <<<"$end_time-$start_time")"
+echo -e "\n\nTotal Executing Time = $elapsed seconds\n" > time.txt
