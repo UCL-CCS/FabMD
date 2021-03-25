@@ -7,6 +7,17 @@
 required_py_packages: &PY_PKG ["easyvvuq"] 
 
 default:
+  # example : 
+  #         exe_file: "app.py"
+  #         exe_prefix: "python3"
+  # or
+  #         exe_file: "app.sh"
+  #         exe_prefix: "bash"
+  # this env variables will be used in case of env.script=generic_app
+  # exe_file should be located inside the target config_files folder
+  exe_file: ""
+  exe_prefix: ""
+
   lammps_params:
     lammps_input: "in.lammps"
     #wall_time: "0:10:00"    
