@@ -16,6 +16,11 @@ This plugin provides functionality to extend FabSim3’s workflow and remote sub
 
    installation
 
+.. toctree::
+   :caption: FabMD Workflow 
+   :maxdepth: 1
+
+   workflow
 
 .. toctree::
    :caption: Execution

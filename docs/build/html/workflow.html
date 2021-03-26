@@ -1,0 +1,304 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>FabMD Workflow &mdash; FabMD  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/js/versions.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/msmb.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="How to run a LAMMPS Job" href="execution.html" />
+    <link rel="prev" title="LAMMPS Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html">
+          
+
+          
+            
+            <img src="_static/logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">LAMMPS Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#namd-installation">NAMD Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#gromacs-installation">GROMACS Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#fabmd-installation">FabMD Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">FabMD Workflow</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">FabMD Workflow</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-of-workflow-for-fabmd">Example of workflow for FabMD</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Execution</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="execution.html">How to run a LAMMPS Job</a></li>
+<li class="toctree-l1"><a class="reference internal" href="execution.html#how-to-run-a-namd-job">How to run a NAMD Job</a></li>
+<li class="toctree-l1"><a class="reference internal" href="execution.html#how-to-run-a-gromacs-job">How to run a GROMACS Job</a></li>
+<li class="toctree-l1"><a class="reference internal" href="execution.html#run-ensemble-examples">Run Ensemble Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="execution.html#gromacs-ensemble-test">Gromacs ensemble test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="execution.html#easyvvuq-fabmd-example">EasyVVUQ + FabMD example</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">FabMD</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>FabMD Workflow</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/workflow.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="fabmd-workflow">
+<span id="workflow"></span><h1>FabMD Workflow<a class="headerlink" href="#fabmd-workflow" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>FabMD is a tool that allows for the easy execution of molecular dynamics simulations in remote machines. This section of the documentation will cover an example of how one would go about configuring FabMD and running a simulation using LAMMPS.</p>
+</div>
+<div class="section" id="example-of-workflow-for-fabmd">
+<h2>Example of workflow for FabMD<a class="headerlink" href="#example-of-workflow-for-fabmd" title="Permalink to this headline">¶</a></h2>
+<p>First, it is important to define a simulation. We create a directory called <code class="docutils literal notranslate"><span class="pre">my-simulation</span></code> which contains a single LAMMPS input script called <code class="docutils literal notranslate"><span class="pre">in.lammps</span></code> that defines the entire simulation. We need to make FabMD aware of this directory, which we can do by placing the <code class="docutils literal notranslate"><span class="pre">my-simulation</span></code> directory inside of the config_files directory (<code class="docutils literal notranslate"><span class="pre">FabSim3/plugins/FabMD/config_files</span></code>). With this, FabMD now recognises the LAMMPS simulation and we are free to call any of the <code class="docutils literal notranslate"><span class="pre">fabsim</span></code> commands on the command line.</p>
+<p>Before submitting the simulation to a remote machine, two YAML files must be edited. First we modify the file <code class="docutils literal notranslate"><span class="pre">FabSim3/deploy/machines_user.yml</span></code> and add our login credentials in the template so that FabMD knows where to run the simulation. In this example we will use the PSNC HPC system called Eagle, so the only parameter we need to add is the <code class="docutils literal notranslate"><span class="pre">username</span></code> we use for that computer. Other computers may have have more parameters that need to be added, such as for example, the UK National Supercomputer ARCHER2, which also requires a password to be entered.</p>
+<p>The next file that needs to be updated is <code class="docutils literal notranslate"><span class="pre">FabSim3/plugins/FabMD/machines_FabMD_user.yml</span></code>. In this file you can set the path to the LAMMPS executable on the remote machine. However, most HPC clusters have LAMMPS available as a module and this can be added in the loaded modules section of the file. This means that the <code class="docutils literal notranslate"><span class="pre">lammps_exec</span></code> parameter can be set to the LAMMPS command rather than the path of the compiled executable. For example, an arbitrary remote machine might look like:</p>
+<blockquote>
+<div><div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">remote-machine-name</span><span class="p">:</span>
+   <span class="nt">lammps_exec</span><span class="p">:</span> <span class="s">&quot;lmp&quot;</span>
+   <span class="l l-Scalar l-Scalar-Plain">...</span>
+   <span class="l l-Scalar l-Scalar-Plain">...</span>
+   <span class="l l-Scalar l-Scalar-Plain">...</span>
+   <span class="nt">modules</span><span class="p">:</span>
+      <span class="nt">loaded</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&quot;lammps/15Apr2020&quot;</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>After all this configuration, we can submit a simulation to a remote machine using the command:</p>
+<blockquote>
+<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">fabsim eagle lammps:my-simulation</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>To recap, this command can be read as follows: execute LAMMPS on a simulation in the directory <code class="docutils literal notranslate"><span class="pre">my-simulation</span></code> inside the remote machine <code class="docutils literal notranslate"><span class="pre">eagle</span></code>. This command will automatically generate a batch script which is sent to the scheduler so that the remote machine can run the simulation. By default, the <code class="docutils literal notranslate"><span class="pre">lammps</span></code> subcommand will execute the file called <code class="docutils literal notranslate"><span class="pre">in.lammps</span></code>. This behaviour can be changed by adding the optional command:</p>
+<blockquote>
+<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">fabsim eagle lammps:my-simulation,lammps_input=new-input.in</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>Where <code class="docutils literal notranslate"><span class="pre">new-input.in</span></code> is the name of the LAMMPS script you wish to execute.</p>
+<p>Additionally, other parameters can be changed such as the number of cores that are used or the maximum <code class="docutils literal notranslate"><span class="pre">job_wall_time</span></code>. An example of a optionally configured command is:</p>
+<blockquote>
+<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">fabsim eagle lammps:my-simulation,cores=1,job_wall_time=0:10:0</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>Once the simulation has been submitted, we can check on the status of the job using the command:</p>
+<blockquote>
+<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">fabsim eagle stat</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>The information provided will differ between machines, but in general this command will give the runtime of the simulation and which nodes are being used.</p>
+<p>When the job has completed, we can use the command:</p>
+<blockquote>
+<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">fabsim eagle fetch_results</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>To copy all of the results from the remote machine to our local computer.</p>
+<p>To summarise, a typical workflow would be composed of the three commands:</p>
+<blockquote>
+<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">fabsim &lt;remote machine name&gt; lammps:&lt;directory in config_files&gt;</span>
+<span class="go">fabsim &lt;remote machine name&gt; stat</span>
+<span class="go">fabsim &lt;remote machine name&gt; fetch_results</span>
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="execution.html" class="btn btn-neutral float-right" title="How to run a LAMMPS Job" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="installation.html" class="btn btn-neutral float-left" title="LAMMPS Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Hamid Arabnejad, Derek Groen, Maxime Vassaux, Werner Muller
+
+    </p>
+  </div> 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  <script>
+    var versions_json_url = ''
+</script>
+
+<div class="rst-versions" data-toggle="rst-versions" role="note"
+     aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"></span>
+        
+      <span class="fa fa-caret-down"></span>
+    </span>
+
+    <div class="rst-other-versions">
+        <dl id="versionselector">
+            <dt>Other Versions</dt>
+        </dl>
+
+    </div>
+</div>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
