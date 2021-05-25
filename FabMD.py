@@ -9,7 +9,11 @@
 #           Hamid Arabnejad, Robbie Sinclair, Derek Groen, Maxime Vassaux,
 #           and Werner Müller
 
-from base.fab import *
+try:
+    from fabsim.base.fab import *
+except ImportError:
+    from base.fab import *
+
 from pprint import pprint
 import os
 import yaml
