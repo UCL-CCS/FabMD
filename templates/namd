@@ -4,11 +4,11 @@ $run_prefix
 /usr/bin/env > env.log
 
 echo "Start $namd_exec program..."
-start_time="$(date -u +%s.%N)"
+start_time="$(date -u +%s.%n)"
 
 $namd_exec $namd_input
 
-end_time="$(date -u +%s.%N)"
+end_time="$(date -u +%s.%n)"
 echo "Done ..."
 
 elapsed="$(bc <<<"$end_time-$start_time")"

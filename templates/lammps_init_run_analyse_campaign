@@ -1,0 +1,26 @@
+
+cd $job_results
+$run_prefix
+
+/usr/bin/env > env.log
+
+start_time="$(date -u +%s.%n)"
+echo "lammps_args = " $lammps_args
+length=`expr "$lammps_args" : '.*'`
+echo "Length of '$lammps_args' is $length"
+
+if [[ $length -eq 0 ]]
+then
+  echo "lammps args is empty!"
+  lammps_args="-screen none"
+else
+  echo "lammps args is not empty!"
+fi
+
+# executing easyvvuq sampler
+python3 MD_easyvvuq_init_run_analyse.py      $machine_name    '$run_command'   $lammps_exec   '$lammps_args'
+
+end_time="$(date -u +%s.%n)"
+elapsed="$(bc <<<"$end_time-$start_time")"
+echo -e "\n\nTotal Executing Time = $elapsed seconds\n" > time.txt
+

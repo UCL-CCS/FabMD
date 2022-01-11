@@ -32,6 +32,3 @@ thermo		50
 
 run 1000
 
-print "solvation_energy" file output.csv
-print "${my_solvation_energy}" append output.csv
-

@@ -12,7 +12,7 @@
 try:
     from fabsim.base.fab import *
 except ImportError:
-    from base.fab import *
+    from fabsim.base import *
 
 from pprint import pprint
 import os
@@ -112,8 +112,8 @@ def gromacs_ensemble(config, grompp=None, conf=None, topol=None,
     if topol is not None:
         env.required_files['topol'] = topol
 
-    env.grompp_command = make_grompp_command(config, kwargs)
-    md_ensemble(config, 'gromacs', sweep_dir, kwargs)
+    env.grompp_command = make_grompp_command(config, **kwargs)
+    md_ensemble(config, 'gromacs', sweep_dir, **kwargs)
 
 
 def md_ensemble(config, script, sweep_dir, **kwargs):
@@ -180,6 +180,27 @@ def make_grompp_command(config, **args):
 
 @task
 @load_plugin_env_vars("FabMD")
+def lammps_init_run_analyse_campaign(config, **args):
+
+    update_environment(args)
+    with_config(config)
+    # to prevent mixing with previous campaign runs
+    env.prevent_results_overwrite = "delete"
+    execute(put_configs, config)
+
+    # adds a label to the generated job folder
+    job_lable = 'init_run_analyse_campaign'
+    # job_name_template: ${config}_${machine_name}_${cores}
+    env.job_name_template += '_{}'.format(job_lable)
+
+    env.script = 'lammps_init_run_analyse_campaign'
+    job(args)
+
+
+
+
+@task
+@load_plugin_env_vars("FabMD")
 def lammps_init_campaign(config, **args):
     """
     fab localhost lammps_init_campaign:fabmd_easyvvuq_test1
@@ -216,6 +237,8 @@ def lammps_run_campaign(config, **args):
     print("remote config file path at: %s" % path_to_config_on_remote_host)
 
     sweep_dir = path_to_config_on_remote_host + "/SWEEP"
+    # path_to_config = find_config_file_path(config)
+    # sweep_dir = os.path.join(path_to_config, env.sweep_dir_name)
     env.script = 'lammps'
 
     # adds a label to the generated job folder
@@ -224,6 +247,7 @@ def lammps_run_campaign(config, **args):
     env.job_name_template += '_{}'.format(job_lable)
 
     env.update(env.lammps_params)
+    print('running ensemble')
     run_ensemble(config, sweep_dir, sweep_on_remote=True,
                  execute_put_configs=False, **args)
 
