@@ -1,7 +1,7 @@
 try:
     from fabsim.base.fab import *
 except ImportError:
-    from base.fab import *
+    from fabsim.base.fab import *
 
 from plugins.FabMD.FabMD import *
 import time

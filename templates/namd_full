@@ -3,7 +3,7 @@ $run_prefix
 
 /usr/bin/env > env.log
 
-start_time="$(date -u +%s.%N)"
+start_time="$(date -u +%s.%n)"
 
 n_drugs=1
 # drug=$app_name
@@ -90,7 +90,7 @@ done
 tmp_str=$$(awk '{ sum += $$1; n++ } END { if (n > 0) print sum / n; }' tmp.output.csv)
 echo "$$drug,$$tmp_str" >> output.csv
 
-end_time="$(date -u +%s.%N)"
+end_time="$(date -u +%s.%n)"
 elapsed="$(bc <<<"$end_time-$start_time")"
 echo -e "\n\nTotal Executing Time = $elapsed seconds\n" > time.txt
 

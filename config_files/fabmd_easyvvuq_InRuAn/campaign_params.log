@@ -1,0 +1,33 @@
+---------------------------------------------
+ The used parameters for easyvvuq campaign
+---------------------------------------------
+campaign_name: FabMD-SCSampler
+decoder_output_columns:
+- solvation_energy
+decoder_target_filename: output.csv
+dimension_adaptive: false
+distribution_type: DiscreteUniform
+encoder_delimiter: '@'
+encoder_target_filename: in.lammps
+encoder_template_fname: lammps.template
+growth: false
+midpoint_level1: false
+parameters:
+    velocity_seed:
+        uniform_range:
+        - 0
+        - 100000000
+params:
+    velocity_seed:
+        default: '1'
+        max: 1e6
+        min: '1'
+        type: integer
+polynomial_order: 2
+quadrature_rule: G
+sampler_name: SCSampler
+selected_parameters:
+- velocity_seed
+sparse: false
+---------------------------------------------
+

@@ -21,14 +21,20 @@ from easyvvuq import Campaign
 from easyvvuq.analysis import SCAnalysis
 from easyvvuq.encoders import GenericEncoder
 
-work_dir = os.path.join(os.path.dirname(__file__))
-sampler_inputs_dir = os.path.join(work_dir, 'sampler_inputs')
 
 
-def init_campaign():
 
-    campaign_params = load_campaign_params()
+def init_run_analyse_campaign(work_dir=None, sampler_inputs_dir=None):
 
+    campaign_params = load_campaign_params(sampler_inputs_dir=sampler_inputs_dir)
+    keys = list(campaign_params.keys())
+    CRED = '\33[31m'
+    CEND = '\33[0m'
+    print('Campaign parameters <---------->')
+    for key in keys:
+        print(CRED + key, ':' + CEND, campaign_params[key])
+    print('\x1b[6;30;45m' + '                   ' + '\x1b[0m')
+    # print('Campaign_params:', campaign_params)
     # set campaign_work_dir
     campaign_work_dir = os.path.join(
         work_dir,
@@ -39,14 +45,16 @@ def init_campaign():
         rmtree(campaign_work_dir)
     os.mkdir(campaign_work_dir)
 
+    db_location = "sqlite:///" + campaign_work_dir + "/campaign.db"
+
     # ------------------------------------------------------
     # here, I used a customized version of Campaign class to
     # better arrangements of generated files and folders
     # ------------------------------------------------------
-    uq.Campaign = CustomCampaign
+    # uq.Campaign = CustomCampaign
 
     # Set up a fresh campaign
-    campaign = uq.Campaign(name=campaign_params['campaign_name'],
+    campaign = uq.Campaign(name=campaign_params['campaign_name'], db_location=db_location,
                            work_dir=campaign_work_dir)
 
     # Create an encoder and decoder
@@ -61,15 +69,58 @@ def init_campaign():
         target_filename=campaign_params['decoder_target_filename'],
         output_columns=campaign_params['decoder_output_columns']
     )
+    # execute = uq.actions.ExecuteLocal(
+    #     "python3 {}/cooling_model.py cooling_in.json".format(work_dir)
+    # )
+    host = 'localhost'
+    # execute = uq.actions.ExecuteLocal(
+    #     "fabsim  {}  lammps_run_campaign:fabmd_easyvvuq_test1, lammps_input={}".format(host, campaign_params['encoder_target_filename'])
+    # )
+    # execute = uq.actions.ExecuteLocal(
+    #     "fabsim  {}  lammps_run_campaign:fabmd_easyvvuq_test1".format(host)
+    # )
+    this_path = campaign._campaign_dir
 
-    # Create a collation element for this campaign
-    collater = uq.collate.AggregateSamples(average=False)
+    # print('this_path', this_path)
+    execute = uq.actions.ExecuteLocal(
+        "python3 {}/easyvvuq_MD_RUN.py {} {}".format(work_dir, campaign_params['encoder_target_filename'], this_path)
+    )
+    actions = uq.actions.Actions(
+        uq.actions.CreateRunDirectory(root=campaign_work_dir, flatten=True),
+        uq.actions.Encode(encoder),
+        execute,
+        uq.actions.Decode(decoder))
 
+    # # Create a collation element for this campaign
+    # # collater = uq.collate.AggregateSamples(average=False)
+    # campaign.add_app(
+    #     name="cooling",
+    #     params=params,
+    #     actions=actions
+    # )
+    #
+    # # Create the sampler
+    # vary = {
+    #     "kappa": cp.Uniform(0.025, 0.075),
+    #     "t_env": cp.Uniform(15, 25)
+    # }
+    # sampler = uq.sampling.PCESampler(vary=vary, polynomial_order=3)
+    #
+    # # Associate the sampler with the campaign
+    # campaign.set_sampler(sampler)
+    #
+    # # Run the cases
+    # campaign.execute(pool=client).collate()
     # Add the covid19-SCSampler app
-    campaign.add_app(name=campaign_params['campaign_name'],
-                     params=campaign_params['params'],
-                     encoder=encoder,
-                     decoder=decoder)
+    campaign.add_app(
+        name=campaign_params['campaign_name'],
+        params=campaign_params['params'],
+        actions=actions
+    )
+    # campaign.add_app(name=campaign_params['campaign_name'],
+    #                  params=campaign_params['params'],
+    #                  encoder=encoder,
+    #                  decoder=decoder)
 
     # parameters to vary
     vary = {}
@@ -115,24 +166,92 @@ def init_campaign():
 
     # Will draw all (of the finite set of samples)
     campaign.draw_samples()
+    from dask.distributed import Client
+    client = Client(processes=True, threads_per_worker=1)
+    campaign.execute(pool=client).collate()
 
-    run_ids = campaign.populate_runs_dir()
+    client.close()
+    client.shutdown()
+    output_column = campaign_params['decoder_output_columns']
+    # Post-processing analysis
+    if campaign_params['sampler_name'] == 'SCSampler':
+        analysis = uq.analysis.SCAnalysis(
+            sampler=campaign._active_sampler,
+            qoi_cols=[output_column]
+        )
+    elif campaign_params['sampler_name'] == 'PCESampler':
+        analysis = uq.analysis.PCEAnalysis(
+            sampler=campaign._active_sampler,
+            qoi_cols=[output_column]
+        )
+    else:
+        print("uq.analysis for sampler_name = %s is not specified! " %
+              (campaign_params['sampler_name']))
+        exit(1)
 
-    # save campaign and sampler state
-    campaign.save_state(os.path.join(campaign_work_dir,
-                                     "campaign_state.json"
-                                     )
-                        )
+    campaign.apply_analysis(analysis)
+    results = campaign.get_last_analysis()
 
-    print("=" * 45)
-    print("With user's specified parameters for sampler")
-    print("easyvvuq generates %d runs" % (len(run_ids)))
-    print("=" * 45)
+    mean = results.raw_data["statistical_moments"][output_column]["mean"]
+    std = results.raw_data["statistical_moments"][output_column]["std"]
+    var = results.raw_data["statistical_moments"][output_column]["var"]
 
-    backup_campaign_files(campaign_work_dir)
+    msg = []
+    msg.append('statistical_moments:')
+    msg.append('mean : %f' % (mean))
+    msg.append('std  : %f' % (std))
+    msg.append('var  : %f' % (var))
+    print_msg_box('\n'.join(s for s in msg),
+                  title='easyvvuq analysis for output_column = %s' %
+                        (output_column))
+    # results = campaign.analyse(qoi_cols=["te"])
+    #
+    # run_ids = campaign.populate_runs_dir()
+    #
+    # # save campaign and sampler state
+    # campaign.save_state(os.path.join(campaign_work_dir,
+    #                                  "campaign_state.json"
+    #                                  )
+    #                     )
 
+    # print("=" * 45)
+    # print("With user's specified parameters for sampler")
+    # print("easyvvuq generates %d runs" % (len(run_ids)))
+    # print("=" * 45)
+    #
+    # backup_campaign_files(campaign_work_dir)
+def print_msg_box(msg, indent=1, width=None, title=None, border="═"):
+    """
+        Print message-box with optional title.
+        source : https://stackoverflow.com/questions/39969064/how-to-print-a-message-box-in-python
+    """
+    if len(msg) == 0:
+        return
 
-def load_campaign_params():
+    if border == "═":
+        t_l, t_r, b_l, b_r = "╔", "╗", "╚", "╝"
+        l = r = "║"
+        t = b = "═"
+
+    elif border == "-":
+        t_l, t_r, b_l, b_r = "┌", "┐", "└", "┘"
+        l = r = "|"
+        t = b = "─"
+    lines = msg.split('\n')
+
+    space = " " * indent
+    if not width:
+        width = max(max(map(len, lines)), len(title))
+    box = f'{t_l}{t * (width + indent * 2)}{t_r}\n'  # upper_border
+    if title:
+        box += f'{l}{space}{title:<{width}}{space}{r}\n'  # title
+        # underscore
+        box += f'{l}{space}{"-" * len(title):<{width}}{space}{r}\n'
+    box += ''.join([f'{l}{space}{line:<{width}}{space}{r}\n' for line in lines])
+    box += f'{b_l}{b * (width + indent * 2)}{b_r}'  # lower_border
+    print(box)
+
+def load_campaign_params(sampler_inputs_dir=None):
     '''
         loading user input sampler yaml file
     '''
@@ -262,4 +381,6 @@ class CustomCampaign(Campaign):
 
 
 if __name__ == "__main__":
-    init_campaign()
+    work_dir = os.path.join(os.path.dirname(__file__))
+    sampler_inputs_dir = os.path.join(work_dir, 'sampler_inputs')
+    init_run_analyse_campaign(work_dir=work_dir, sampler_inputs_dir=sampler_inputs_dir)

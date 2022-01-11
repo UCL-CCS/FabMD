@@ -4,7 +4,7 @@ $run_prefix
 
 /usr/bin/env > env.log
 
-start_time="$(date -u +%s.%N)"
+start_time="$(date -u +%s.%n)"
 
 # copy job output files back to easyvvuq campaign SWEEP folder
 results_RUN_dir=$$(find $src_campaign_dir -maxdepth 1 -name "RUNS" -type d)
@@ -26,7 +26,7 @@ echo "=================================="
 cd $dst_campaign_dir
 python MD_easyvvuq_analyse.py
 
-end_time="$(date -u +%s.%N)"
+end_time="$(date -u +%s.%n)"
 elapsed="$(bc <<<"$end_time-$start_time")"
 echo -e "\n\nTotal Executing Time = $elapsed seconds\n" > time.txt
 

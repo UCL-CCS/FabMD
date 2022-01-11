@@ -46,9 +46,13 @@ default:
 
 localhost:
   # location of lmp_serial in your local PC
-  lammps_exec: "/home/hamid/lammps/src/lmp_serial"
+  lammps_exec: "/Users/kevinbronik/lammps/src/lmp_serial"
   gromacs_exec: "/usr/local/gromacs/bin/gmx"
   # used core for executing lmp_serial on your local PC
+  lammps_params:
+    lammps_input: "in.lammps"
+    #wall_time: "0:10:00"
+    sweep_dir_name: "SWEEP"
   cores: 1
 
 eagle_hidalgo:
@@ -87,4 +91,33 @@ eagle_vecma:
     loaded: ["openmpi/4.0.0_gcc620", "lammps/15Apr2020", "gromacs/2018_mpi", "namd", "amber"]
     # list of modules to be unloaded on remote machine
     unloaded: ["python"]
+
+
+cirrus:
+    # location of lmp_serial on the remote machine
+  lammps_exec: "/lustre/sw/LAMMPS/3March20_intel19_mpt222/bin/lmp_mpi"
+
+  modules:
+      # list of modules to be loaded on remote machine
+      loaded: [ "lammps"]
+
+
+ohm:
+    # location of lmp_serial on the remote machine
+  lammps_exec: "/home/kevinb/lammps-17Nov16/src/lmp_serial"
+  cores: 2
+
+      # list of modules to be loaded on remote machine
+#      loaded: [ "lammps/13Apr17/intel-2017", "gromacs/2018/intel-2017", "fftw/2.1.5/intel-2015-update2", "namd/2.12/intel-2018-update3" ]
+
+Kathleen:
+    # location of lmp_serial on the remote machine
+  lammps_exec: "/shared/ucl/apps/lammps/16Mar18/USERINTEL/intel-2018/lammps-16Mar18/bin/lmp_default"
+  cores: 28
+
+  modules:
+      # list of modules to be loaded on remote machine
+      loaded: [ "python/3.7.4", "lammps/16Mar18/userintel/intel-2018", "gromacs/2018/intel-2017", "fftw/2.1.5/intel-2015-update2", "namd/2.12/intel-2018-update3" ]
+
+
 

@@ -27,7 +27,7 @@ energygrps               = POPC DNA_TC PW_IONS
 ;
 ; Coulomb interactions can alternatively be treated using a reaction-field,
 ; giving slightly better properties.
- Please realize that electrostVatic interactions in the Martini model are 
+; Please realize that electrostVatic interactions in the Martini model are
 ; not considered to be very accurate to begin with, especially as the 
 ; screening in the system is set to be uniform across the system with 
 ; a screening constant of 15. When using PME, please make sure your 
