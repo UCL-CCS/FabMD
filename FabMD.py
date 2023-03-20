@@ -97,7 +97,9 @@ def lammps_ensemble(config, sweep_dir=False, seeded=False, **kwargs):
     '''
     env.update(env.lammps_params)
     if seeded:
-        env.run_prefix_commands.append("python3 generate-seed.py")
+        env.run_lammps_preprocess = "python3 generate-seed.py"
+    else:
+        env.run_lammps_preprocess = ""
     md_ensemble(config, 'lammps', sweep_dir, **kwargs)
 
 
