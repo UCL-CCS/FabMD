@@ -88,7 +88,7 @@ def md_job(config, script, **args):
 
 @task
 @load_plugin_env_vars("FabMD")
-def lammps_ensemble(config, sweep_dir=False, **kwargs):
+def lammps_ensemble(config, sweep_dir=False, seeded=False, **kwargs):
     '''
         fab localhost lammps_ensemble:lammps_ensemble_example1
         fab localhost lammps_ensemble:lammps_ensemble_example2
@@ -96,6 +96,8 @@ def lammps_ensemble(config, sweep_dir=False, **kwargs):
     https://github.com/UCL-CCS/FabMD/blob/hamid-dev/doc/RunEnsemble-examples.md
     '''
     env.update(env.lammps_params)
+    if seeded:
+        env.run_prefix_commands.append("python3 generate-seed.py")
     md_ensemble(config, 'lammps', sweep_dir, **kwargs)
 
 

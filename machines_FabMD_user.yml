@@ -46,7 +46,7 @@ default:
 
 localhost:
   # location of lmp_serial in your local PC
-  lammps_exec: "/Users/kevinbronik/lammps/src/lmp_serial"
+  lammps_exec: "/usr/bin/lmp"
   gromacs_exec: "/usr/local/gromacs/bin/gmx"
   # used core for executing lmp_serial on your local PC
   lammps_params:
